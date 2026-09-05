@@ -1,6 +1,6 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){display:none!important}</style></head><body>
 <title>Viens me voir à Londres</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap">
 <style>
   :root {
     --bg: #fbf0ec;
@@ -9,13 +9,16 @@
     --border: #ecd9cf;
     --text: #3a2b2c;
     --text-muted: #9a827e;
-    --free: #cf4f74;
-    --free-soft: #fbe1e8;
-    --paris: #4c3c68;
-    --paris-soft: #e9e2f1;
-    --taken: #b9821f;
-    --taken-soft: #f5e7c8;
-    --shadow: rgba(120, 70, 60, 0.10);
+    --text-faint: #cdb9b2;
+
+    --free: #2f9166;
+    --free-soft: #e1f2e9;
+    --taken: #c94a56;
+    --taken-soft: #f8e1e4;
+    --paris: #3f5f96;
+    --paris-soft: #e3e8f4;
+
+    --shadow: rgba(120, 70, 60, 0.14);
   }
 
   @media (prefers-color-scheme: dark) {
@@ -26,13 +29,16 @@
       --border: #4a373b;
       --text: #f5e9e6;
       --text-muted: #bda29d;
-      --free: #ec7c9b;
-      --free-soft: #402530;
-      --paris: #a695d0;
-      --paris-soft: #362d4a;
-      --taken: #e0b45a;
-      --taken-soft: #40331a;
-      --shadow: rgba(0, 0, 0, 0.3);
+      --text-faint: #6b5a56;
+
+      --free: #57c191;
+      --free-soft: #1e3a2c;
+      --taken: #e8828c;
+      --taken-soft: #4a2529;
+      --paris: #8fa8dd;
+      --paris-soft: #293a5c;
+
+      --shadow: rgba(0, 0, 0, 0.4);
     }
   }
   :root[data-theme="dark"] {
@@ -42,29 +48,37 @@
     --border: #4a373b;
     --text: #f5e9e6;
     --text-muted: #bda29d;
-    --free: #ec7c9b;
-    --free-soft: #402530;
-    --paris: #a695d0;
-    --paris-soft: #362d4a;
-    --taken: #e0b45a;
-    --taken-soft: #40331a;
-    --shadow: rgba(0, 0, 0, 0.3);
+    --text-faint: #6b5a56;
+
+    --free: #57c191;
+    --free-soft: #1e3a2c;
+    --taken: #e8828c;
+    --taken-soft: #4a2529;
+    --paris: #8fa8dd;
+    --paris-soft: #293a5c;
+
+    --shadow: rgba(0, 0, 0, 0.4);
   }
 
   * { box-sizing: border-box; }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
   body {
     background: var(--bg);
     color: var(--text);
     font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    padding: clamp(18px, 5vw, 60px);
     display: flex;
     justify-content: center;
   }
-  main { width: 100%; max-width: 700px; }
-
-  header {
-    margin-bottom: 30px;
+  main {
+    width: 100%;
+    max-width: 460px;
+    padding: clamp(16px, 5vw, 28px) 16px 100px;
   }
+
+  header { margin-bottom: 18px; }
   .route-mark {
     display: flex;
     align-items: center;
@@ -80,140 +94,256 @@
   h1 {
     font-family: 'Fraunces', serif;
     font-weight: 600;
-    font-size: clamp(30px, 6.5vw, 46px);
-    line-height: 1.05;
-    margin: 0 0 10px;
+    font-size: clamp(26px, 7vw, 34px);
+    line-height: 1.08;
+    margin: 0 0 8px;
     text-wrap: balance;
   }
   .lede {
     color: var(--text-muted);
-    font-size: 15px;
-    line-height: 1.6;
-    max-width: 52ch;
+    font-size: 14px;
+    line-height: 1.55;
+    margin: 0;
+    max-width: 42ch;
   }
 
   .legend {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
-    margin: 22px 0 34px;
-    padding: 14px 18px;
+    gap: 8px 16px;
+    margin: 18px 0 24px;
+    padding: 10px 14px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
-    box-shadow: 0 4px 14px var(--shadow);
+    box-shadow: 0 3px 10px var(--shadow);
   }
   .legend-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 12.5px;
+    gap: 7px;
+    font-size: 12px;
+    font-weight: 500;
     color: var(--text-muted);
   }
   .legend-dot {
     width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
   }
 
-  section { margin-bottom: 34px; }
-  h2 {
+  .freecount {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    margin: -10px 0 20px;
+  }
+
+  .month + .month { margin-top: 26px; }
+  .month-title {
     font-family: 'Fraunces', serif;
     font-weight: 600;
-    font-size: 20px;
-    margin: 0 0 4px;
-  }
-  .section-sub {
-    font-size: 13px;
-    color: var(--text-muted);
-    margin: 0 0 14px;
+    font-size: 17px;
+    margin: 0 0 10px;
+    text-transform: capitalize;
   }
 
-  .taken-card {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: var(--taken-soft);
-    border-radius: 12px;
-    padding: 13px 16px;
-    font-size: 14px;
+  .weekday-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 6px;
   }
-  .taken-card strong { font-weight: 600; }
-  .taken-card .tag {
-    margin-left: auto;
+  .weekday-row span {
+    text-align: center;
     font-size: 10.5px;
     font-weight: 600;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: var(--taken);
-    background: var(--surface);
-    padding: 3px 9px;
-    border-radius: 999px;
-    white-space: nowrap;
+    color: var(--text-faint);
   }
 
-  .paris-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .chip-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+  .day-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
   }
 
-  /* Boîte de date unique, même gabarit partout (Paris comme week-ends libres) */
-  .date-box {
+  .day {
+    position: relative;
+    aspect-ratio: 1 / 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 128px;
-    height: 44px;
-    padding: 0;
-    margin: 0;
-    border: none;
-    border-radius: 12px;
-    background: var(--free-soft);
-    color: var(--free);
-    font-family: 'Fraunces', serif;
+    border-radius: 10px;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 13.5px;
     font-weight: 600;
-    font-size: 14px;
-    letter-spacing: 0.01em;
-    white-space: nowrap;
-    text-align: center;
+    font-variant-numeric: tabular-nums;
+    border: none;
+    padding: 0;
+    color: var(--text-faint);
+    background: transparent;
   }
-  .date-box.date-box-paris {
-    background: var(--paris-soft);
-    color: var(--paris);
-  }
-  button.date-box {
-    cursor: pointer;
-    transition: transform 0.1s ease, box-shadow 0.15s ease;
-  }
-  button.date-box:hover:not(:disabled) {
-    box-shadow: 0 4px 12px var(--shadow);
-    transform: translateY(-1px);
-  }
-  button.date-box:disabled {
-    cursor: default;
-  }
-  .date-box.date-box-confirmed {
-    background: var(--taken-soft);
-    color: var(--taken);
-  }
-  .date-box.date-box-pending {
-    opacity: 0.6;
+  .day-muted { color: var(--text-faint); }
+  .day-free { background: var(--free-soft); color: var(--free); cursor: pointer; }
+  .day-taken { background: var(--taken-soft); color: var(--taken); cursor: pointer; }
+  .day-paris { background: var(--paris-soft); color: var(--paris); cursor: pointer; }
+  button.day:active { transform: scale(0.94); }
+  button.day:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+  button.day:disabled { opacity: 0.6; }
+
+  .day.is-selected { background: var(--free); color: var(--surface); }
+  .day.is-selected::after {
+    content: '✓';
+    position: absolute;
+    top: -4px; right: -4px;
+    width: 15px; height: 15px;
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--free);
+    font-size: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 4px var(--shadow);
   }
 
-  .cta {
-    margin-top: 6px;
-    padding: 18px 20px;
-    background: var(--paris-soft);
-    border-radius: 14px;
-    font-family: 'Fraunces', serif;
-    font-size: 16px;
-    color: var(--text);
+  .popover {
+    position: absolute;
+    z-index: 60;
+    max-width: 200px;
+    padding: 7px 12px;
+    border-radius: 10px;
+    font-size: 12.5px;
+    font-weight: 600;
     text-align: center;
+    white-space: nowrap;
+    color: var(--surface);
+    background: var(--taken);
+    box-shadow: 0 8px 20px var(--shadow);
   }
+  .popover.popover-paris { background: var(--paris); }
+  .popover::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+  }
+  .popover:not(.popover-below)::after { top: 100%; border-top: 6px solid var(--taken); }
+  .popover.popover-paris:not(.popover-below)::after { border-top-color: var(--paris); }
+  .popover.popover-below::after { bottom: 100%; border-bottom: 6px solid var(--taken); }
+  .popover.popover-below.popover-paris::after { border-bottom-color: var(--paris); }
+
+  .actionbar {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    box-shadow: 0 -6px 20px var(--shadow);
+  }
+  .actionbar-count { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+  .actionbar-clear {
+    background: none; border: none; padding: 0; margin-left: 8px;
+    color: var(--text-muted); text-decoration: underline; font-size: 12px; cursor: pointer;
+  }
+  .btn-primary {
+    font-family: 'Work Sans', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--surface);
+    background: var(--free);
+    border: none;
+    border-radius: 999px;
+    padding: 11px 22px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn-primary:active { transform: scale(0.97); }
+  .btn-primary:disabled { opacity: 0.7; cursor: default; }
+
+  .sheet-overlay {
+    position: fixed; inset: 0; z-index: 70;
+    background: rgba(20, 14, 13, 0.45);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .sheet-overlay.is-open { opacity: 1; }
+  .sheet {
+    width: 100%;
+    max-width: 460px;
+    background: var(--surface);
+    border-radius: 18px 18px 0 0;
+    padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+    transform: translateY(100%);
+    transition: transform 0.25s ease;
+  }
+  .sheet-overlay.is-open .sheet { transform: translateY(0); }
+  .sheet h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 19px;
+    margin: 0 0 4px;
+  }
+  .sheet-summary { font-size: 13px; color: var(--text-muted); margin: 0 0 16px; }
+  .sheet label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .sheet input {
+    width: 100%;
+    font: inherit;
+    font-size: 15px;
+    padding: 11px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+  .sheet input:focus-visible { outline: 2px solid var(--free); outline-offset: 1px; }
+  .sheet-actions { display: flex; gap: 10px; }
+  .btn-secondary {
+    flex: 1;
+    font-family: 'Work Sans', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-muted);
+    background: var(--surface-2);
+    border: none;
+    border-radius: 999px;
+    padding: 12px;
+    cursor: pointer;
+  }
+  .sheet-actions .btn-primary { flex: 1.4; text-align: center; }
+
+  .toast {
+    position: fixed;
+    left: 50%; bottom: 90px;
+    transform: translate(-50%, 12px);
+    z-index: 80;
+    background: var(--text);
+    color: var(--bg);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 999px;
+    box-shadow: 0 8px 24px var(--shadow);
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .toast.is-visible { opacity: 1; transform: translate(-50%, 0); }
 
   footer {
     margin-top: 30px;
@@ -222,10 +352,6 @@
     font-size: 11.5px;
     color: var(--text-muted);
     text-align: center;
-  }
-
-  @media (max-width: 480px) {
-    .date-box { width: 104px; height: 40px; font-size: 12.5px; }
   }
 </style>
 
@@ -240,129 +366,301 @@
       Londres · Paris
     </div>
     <h1>Viens me voir à Londres</h1>
-    <p class="lede">Voici mes prochains six mois : quand je serai à Paris, et surtout — quels week-ends sont encore libres pour que tu passes me voir. Repère une date et préviens-moi !</p>
+    <p class="lede">Voici mes six prochains mois : quand je suis à Paris, qui vient déjà, et surtout — quels jours sont encore libres. Touche un ou plusieurs jours, puis réserve.</p>
   </header>
 
   <div class="legend">
-    <div class="legend-item"><span class="legend-dot" style="background: var(--free)"></span>Libre — viens !</div>
-    <div class="legend-item"><span class="legend-dot" style="background: var(--taken)"></span>Déjà prévu</div>
-    <div class="legend-item"><span class="legend-dot" style="background: var(--paris)"></span>Je suis à Paris</div>
+    <div class="legend-item"><span class="legend-dot" style="background: var(--free)"></span>Libre</div>
+    <div class="legend-item"><span class="legend-dot" style="background: var(--taken)"></span>Réservé</div>
+    <div class="legend-item"><span class="legend-dot" style="background: var(--paris)"></span>Cannelle à Paris</div>
   </div>
 
-  <!-- TAKEN_START -->
-      <div class="taken-card">
-      <span>🎉</span>
-      <span><strong>Anna</strong> vient du 14 novembre au 16 novembre 2026</span>
-      <span class="tag">Complet</span>
-    </div>
-    <div class="taken-card">
-      <span>🎉</span>
-      <span><strong>Thaïs</strong> vient du 9 janvier au 10 janvier 2027</span>
-      <span class="tag">Complet</span>
-    </div>
-    <div class="taken-card">
-      <span>🎉</span>
-      <span><strong>cyril</strong> vient du 8 mai au 9 mai 2027</span>
-      <span class="tag">Complet</span>
-    </div>
-      <!-- TAKEN_END -->
-
-  <section>
-    <h2>Je suis à Paris</h2>
-    <p class="section-sub">Pas la peine de passer à Londres ces jours-là — mais si toi aussi tu es à Paris...</p>
-    <div class="paris-list">
-      <!-- PARIS_START -->
-      <div class="date-box date-box-paris">27/11–29/11</div>
-      <div class="date-box date-box-paris">04/12–06/12</div>
-      <div class="date-box date-box-paris">24/12–02/01</div>
-      <div class="date-box date-box-paris">14/01–17/01</div>
-      <div class="date-box date-box-paris">22/01–24/01</div>
-      <div class="date-box date-box-paris">26/02–28/02</div>
-      <div class="date-box date-box-paris">25/03–29/03</div>
-      <div class="date-box date-box-paris">16/04–18/04</div>
-      <div class="date-box date-box-paris">30/04–03/05</div>
-      <!-- PARIS_END -->
-    </div>
-  </section>
-
-  <section>
-    <h2>Week-ends libres pour venir</h2>
-    <p class="section-sub"><!-- FREECOUNT_START -->
-      13 week-ends encore sans plan, entre le 14 novembre 2026 et le 14 mai 2027.
+  <p class="freecount"><!-- FREECOUNT_START -->
+      13 jours encore libres, entre le 14 novembre 2026 et le 14 mai 2027.
       <!-- FREECOUNT_END --></p>
-    <div class="chip-grid">
-      <!-- FREE_START -->
-      <button type="button" class="date-box" data-start="2026-11-21" data-end="2026-11-23" data-label="21/11–22/11">21/11–22/11</button>
-      <button type="button" class="date-box" data-start="2026-12-12" data-end="2026-12-14" data-label="12/12–13/12">12/12–13/12</button>
-      <button type="button" class="date-box" data-start="2026-12-19" data-end="2026-12-21" data-label="19/12–20/12">19/12–20/12</button>
-      <button type="button" class="date-box" data-start="2027-01-30" data-end="2027-02-01" data-label="30/01–31/01">30/01–31/01</button>
-      <button type="button" class="date-box" data-start="2027-02-06" data-end="2027-02-08" data-label="06/02–07/02">06/02–07/02</button>
-      <button type="button" class="date-box" data-start="2027-02-13" data-end="2027-02-15" data-label="13/02–14/02">13/02–14/02</button>
-      <button type="button" class="date-box" data-start="2027-02-20" data-end="2027-02-22" data-label="20/02–21/02">20/02–21/02</button>
-      <button type="button" class="date-box" data-start="2027-03-06" data-end="2027-03-08" data-label="06/03–07/03">06/03–07/03</button>
-      <button type="button" class="date-box" data-start="2027-03-13" data-end="2027-03-15" data-label="13/03–14/03">13/03–14/03</button>
-      <button type="button" class="date-box" data-start="2027-03-20" data-end="2027-03-22" data-label="20/03–21/03">20/03–21/03</button>
-      <button type="button" class="date-box" data-start="2027-04-03" data-end="2027-04-05" data-label="03/04–04/04">03/04–04/04</button>
-      <button type="button" class="date-box" data-start="2027-04-10" data-end="2027-04-12" data-label="10/04–11/04">10/04–11/04</button>
-      <button type="button" class="date-box" data-start="2027-04-24" data-end="2027-04-26" data-label="24/04–25/04">24/04–25/04</button>
-      <!-- FREE_END -->
-    </div>
-  </section>
 
-  <div class="cta">Un de ces week-ends te tente ? Clique dessus, ou dis-le-moi et on cale ça 💌</div>
+  <div id="calendar"></div>
 
   <footer><!-- FOOTER_START -->
       Dernière mise à jour : samedi 5 septembre 2026 — fenêtre glissante de 6 mois à partir du 14 novembre 2026
       <!-- FOOTER_END --></footer>
 </main>
 
+<div id="popover" class="popover" hidden></div>
+
+<div id="actionbar" class="actionbar" hidden>
+  <div>
+    <span id="actionbar-count" class="actionbar-count"></span>
+    <button type="button" id="actionbar-clear" class="actionbar-clear">tout désélectionner</button>
+  </div>
+  <button type="button" id="reserve-btn" class="btn-primary">Réserver</button>
+</div>
+
+<div id="sheet-overlay" class="sheet-overlay" hidden>
+  <div class="sheet">
+    <h2>Ton prénom ?</h2>
+    <p id="sheet-summary" class="sheet-summary"></p>
+    <label for="sheet-name">Prénom</label>
+    <input type="text" id="sheet-name" placeholder="Ex. Camille" autocomplete="given-name">
+    <div class="sheet-actions">
+      <button type="button" id="sheet-cancel" class="btn-secondary">Annuler</button>
+      <button type="button" id="sheet-confirm" class="btn-primary">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+  // Données régénérées par apps-script/Code.gs (regenerateAndPublish) à chaque
+  // sync et à chaque réservation. Ne pas éditer ces valeurs à la main : elles
+  // seront écrasées à la prochaine sync.
+  <!-- DATA_START -->
+      const WINDOW_START = "2026-11-14";
+      const WINDOW_END = "2027-05-14";
+      const PARIS_RANGES = [["2026-11-27","2026-11-29"],["2026-12-04","2026-12-06"],["2026-12-24","2027-01-02"],["2027-01-14","2027-01-17"],["2027-01-22","2027-01-24"],["2027-02-26","2027-02-28"],["2027-03-25","2027-03-29"],["2027-04-16","2027-04-18"],["2027-04-30","2027-05-03"]];
+      const BOOKINGS = [{"name":"Anna","start":"2026-11-14","end":"2026-11-16"},{"name":"Thaïs","start":"2027-01-09","end":"2027-01-10"},{"name":"cyril","start":"2027-05-08","end":"2027-05-09"}];
+      <!-- DATA_END -->
+</script>
+
 <script>
   // URL du Web App Google Apps Script (déploiement "Exécuter en tant que : Moi",
   // accès "Tous"). Voir apps-script/README.md pour la procédure de déploiement.
-  const WEBAPP_URL ='https://script.google.com/macros/s/AKfycbwEVaBMtxgoR_CcoI1lILRCl5lXzpkCNN3Yo_ky8mPWr-woWVlKTSrjEwqwLESAS3Xk/exec';
+  const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwEVaBMtxgoR_CcoI1lILRCl5lXzpkCNN3Yo_ky8mPWr-woWVlKTSrjEwqwLESAS3Xk/exec';
 
-  document.querySelectorAll('.chip-grid').forEach((grid) => {
-    grid.addEventListener('click', async (e) => {
-      const btn = e.target.closest('button.date-box[data-start]');
-      if (!btn || btn.disabled) return;
-      if (WEBAPP_URL.startsWith('REPLACE_')) {
-        alert("La réservation en ligne n'est pas encore configurée — préviens directement par message pour ce week-end.");
-        return;
+  const MONTHS_FULL = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+  const WEEKDAYS = ['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di'];
+
+  const selected = new Set();
+
+  function toKey(d) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+  function parseKey(key) {
+    const [y, m, d] = key.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+  function addDaysLocal(date, n) {
+    const d = new Date(date);
+    d.setDate(d.getDate() + n);
+    return d;
+  }
+  function toDDMM(key) {
+    const [, m, d] = key.split('-');
+    return `${d}/${m}`;
+  }
+  function inRange(key, start, end) { return key >= start && key <= end; }
+
+  function monthsBetween(startKey, endKeyExclusive) {
+    const start = parseKey(startKey);
+    const endInclusive = addDaysLocal(parseKey(endKeyExclusive), -1);
+    const months = [];
+    let y = start.getFullYear();
+    let m = start.getMonth();
+    const ey = endInclusive.getFullYear();
+    const em = endInclusive.getMonth();
+    while (y < ey || (y === ey && m <= em)) {
+      months.push([y, m]);
+      m++;
+      if (m > 11) { m = 0; y++; }
+    }
+    return months;
+  }
+
+  function statusOf(key) {
+    if (key < WINDOW_START || key >= WINDOW_END) return { type: 'muted' };
+    for (const [s, e] of PARIS_RANGES) if (inRange(key, s, e)) return { type: 'paris' };
+    for (const b of BOOKINGS) if (inRange(key, b.start, b.end)) return { type: 'taken', name: b.name };
+    return { type: 'free' };
+  }
+
+  function renderCell(date, monthIndex) {
+    const key = toKey(date);
+    const inThisMonth = date.getMonth() === monthIndex;
+    const status = statusOf(key);
+    const dayNum = date.getDate();
+    if (!inThisMonth || status.type === 'muted') {
+      return `<div class="day day-muted" aria-hidden="true">${dayNum}</div>`;
+    }
+    if (status.type === 'paris') {
+      return `<button type="button" class="day day-paris" data-key="${key}" data-kind="paris" aria-label="${dayNum}, Cannelle à Paris">${dayNum}</button>`;
+    }
+    if (status.type === 'taken') {
+      return `<button type="button" class="day day-taken" data-key="${key}" data-kind="taken" data-name="${status.name}" aria-label="${dayNum}, réservé par ${status.name}">${dayNum}</button>`;
+    }
+    return `<button type="button" class="day day-free" data-key="${key}" data-kind="free" aria-label="${dayNum}, libre" aria-pressed="false">${dayNum}</button>`;
+  }
+
+  function renderMonth(year, monthIndex) {
+    const first = new Date(year, monthIndex, 1);
+    const startWeekday = (first.getDay() + 6) % 7;
+    const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+    const totalCells = Math.ceil((startWeekday + daysInMonth) / 7) * 7;
+    let cells = '';
+    for (let i = 0; i < totalCells; i++) {
+      const date = new Date(year, monthIndex, 1 - startWeekday + i);
+      cells += renderCell(date, monthIndex);
+    }
+    return `<section class="month">
+      <h2 class="month-title">${MONTHS_FULL[monthIndex]} ${year}</h2>
+      <div class="weekday-row">${WEEKDAYS.map((w) => `<span>${w}</span>`).join('')}</div>
+      <div class="day-grid">${cells}</div>
+    </section>`;
+  }
+
+  function renderCalendar() {
+    const months = monthsBetween(WINDOW_START, WINDOW_END);
+    document.getElementById('calendar').innerHTML = months.map(([y, m]) => renderMonth(y, m)).join('');
+  }
+  renderCalendar();
+
+  function updateBar() {
+    const bar = document.getElementById('actionbar');
+    const count = selected.size;
+    bar.hidden = count === 0;
+    if (count > 0) {
+      document.getElementById('actionbar-count').textContent = `${count} jour${count > 1 ? 's' : ''} sélectionné${count > 1 ? 's' : ''}`;
+    }
+  }
+
+  function showPopover(anchor, text, kind) {
+    const pop = document.getElementById('popover');
+    pop.textContent = text;
+    pop.className = `popover${kind === 'paris' ? ' popover-paris' : ''}`;
+    pop.hidden = false;
+    const rect = anchor.getBoundingClientRect();
+    const popRect = pop.getBoundingClientRect();
+    let top = rect.top - popRect.height - 10 + window.scrollY;
+    let below = false;
+    if (top < window.scrollY + 8) { top = rect.bottom + 10 + window.scrollY; below = true; }
+    pop.classList.toggle('popover-below', below);
+    let left = rect.left + rect.width / 2 - popRect.width / 2 + window.scrollX;
+    left = Math.max(8, Math.min(left, window.scrollX + document.documentElement.clientWidth - popRect.width - 8));
+    pop.style.top = `${top}px`;
+    pop.style.left = `${left}px`;
+    pop.dataset.openFor = anchor.dataset.key;
+  }
+  function hidePopover() {
+    const pop = document.getElementById('popover');
+    pop.hidden = true;
+    delete pop.dataset.openFor;
+  }
+
+  document.getElementById('calendar').addEventListener('click', (e) => {
+    const btn = e.target.closest('button.day');
+    if (!btn || btn.disabled) return;
+    const kind = btn.dataset.kind;
+    if (kind === 'free') {
+      hidePopover();
+      const key = btn.dataset.key;
+      if (selected.has(key)) {
+        selected.delete(key);
+        btn.classList.remove('is-selected');
+        btn.setAttribute('aria-pressed', 'false');
+      } else {
+        selected.add(key);
+        btn.classList.add('is-selected');
+        btn.setAttribute('aria-pressed', 'true');
       }
-
-      const label = btn.dataset.label;
-      const name = (prompt(`Ton prénom, pour le week-end du ${label} ?`) || '').trim();
-      if (!name) return;
-
-      const original = btn.textContent;
-      btn.disabled = true;
-      btn.classList.add('date-box-pending');
-
-      try {
-        const res = await fetch(WEBAPP_URL, {
-          method: 'POST',
-          // text/plain évite le preflight CORS que les Web Apps Apps Script gèrent mal.
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ name, start: btn.dataset.start, end: btn.dataset.end }),
-        });
-        const data = await res.json();
-        btn.classList.remove('date-box-pending');
-        if (data.ok) {
-          btn.classList.add('date-box-confirmed');
-          btn.title = `Confirmé pour ${name}`;
-          btn.textContent = `✓ ${label}`;
-        } else {
-          alert(data.message || "Ce week-end vient d'être pris, désolé ! Recharge la page.");
-          btn.disabled = false;
-          btn.textContent = original;
-        }
-      } catch (err) {
-        btn.classList.remove('date-box-pending');
-        alert('Erreur réseau, réessaie dans un instant.');
-        btn.disabled = false;
-        btn.textContent = original;
+      updateBar();
+    } else {
+      const pop = document.getElementById('popover');
+      if (!pop.hidden && pop.dataset.openFor === btn.dataset.key) {
+        hidePopover();
+      } else {
+        showPopover(btn, kind === 'taken' ? btn.dataset.name : 'Cannelle à Paris', kind);
       }
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('button.day') || e.target.closest('.popover')) return;
+    hidePopover();
+  });
+
+  document.getElementById('actionbar-clear').addEventListener('click', () => {
+    selected.forEach((key) => {
+      const cell = document.querySelector(`button.day[data-key="${key}"]`);
+      if (cell) { cell.classList.remove('is-selected'); cell.setAttribute('aria-pressed', 'false'); }
     });
+    selected.clear();
+    updateBar();
+  });
+
+  function summarizeSelection() {
+    const keys = Array.from(selected).sort();
+    const labels = keys.map(toDDMM);
+    if (labels.length === 1) return `Le ${labels[0]}`;
+    return `Les ${labels.slice(0, -1).join(', ')} et ${labels[labels.length - 1]}`;
+  }
+
+  function openSheet() {
+    document.getElementById('sheet-summary').textContent = summarizeSelection();
+    const overlay = document.getElementById('sheet-overlay');
+    overlay.hidden = false;
+    requestAnimationFrame(() => overlay.classList.add('is-open'));
+    document.getElementById('sheet-name').value = '';
+    setTimeout(() => document.getElementById('sheet-name').focus(), 150);
+  }
+  function closeSheet() {
+    const overlay = document.getElementById('sheet-overlay');
+    overlay.classList.remove('is-open');
+    setTimeout(() => { overlay.hidden = true; }, 220);
+  }
+
+  document.getElementById('reserve-btn').addEventListener('click', openSheet);
+  document.getElementById('sheet-cancel').addEventListener('click', closeSheet);
+  document.getElementById('sheet-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'sheet-overlay') closeSheet();
+  });
+
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('is-visible');
+    setTimeout(() => toast.classList.remove('is-visible'), 2500);
+  }
+
+  document.getElementById('sheet-confirm').addEventListener('click', async () => {
+    const name = document.getElementById('sheet-name').value.trim();
+    if (!name) { document.getElementById('sheet-name').focus(); return; }
+    const keys = Array.from(selected).sort();
+    const confirmBtn = document.getElementById('sheet-confirm');
+    const originalLabel = confirmBtn.textContent;
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Envoi...';
+    try {
+      const res = await fetch(WEBAPP_URL, {
+        method: 'POST',
+        // text/plain évite le preflight CORS que les Web Apps Apps Script gèrent mal.
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ name, dates: keys }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        keys.forEach((key) => {
+          const cell = document.querySelector(`button.day[data-key="${key}"]`);
+          if (cell) {
+            cell.className = 'day day-taken';
+            cell.dataset.kind = 'taken';
+            cell.dataset.name = name;
+            cell.setAttribute('aria-label', `${cell.textContent}, réservé par ${name}`);
+            cell.removeAttribute('aria-pressed');
+          }
+        });
+        selected.clear();
+        updateBar();
+        closeSheet();
+        showToast(`Réservé pour ${name} 🎉`);
+      } else {
+        alert(data.message || "Un des jours vient d'être pris entre-temps, désolé — recharge la page.");
+      }
+    } catch (err) {
+      alert('Erreur réseau, réessaie dans un instant.');
+    } finally {
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = originalLabel;
+    }
   });
 </script>
 

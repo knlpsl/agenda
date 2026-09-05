@@ -88,48 +88,54 @@ par l'URL copiée à l'étape 6, puis commit/push sur `main`.
 
 ## 8. Tester de bout en bout
 
-1. Ouvrez la page publique, cliquez sur un week-end libre, entrez un
-   prénom de test.
-2. Vérifiez : l'événement `<prénom> en visite à Londres` apparaît dans
-   Google Agenda ; un email arrive sur c.pelissolo@gmail.com ; un nouveau
-   commit "Sync agenda: ..." apparaît sur GitHub.
+1. Ouvrez la page publique (agenda mobile, mois par mois), touchez un ou
+   plusieurs jours verts, appuyez sur **Réserver**, entrez un prénom de
+   test dans la feuille qui remonte.
+2. Vérifiez : un événement `<prénom> en visite à Londres` apparaît dans
+   Google Agenda pour chaque plage de jours consécutifs sélectionnée ; un
+   email arrive sur c.pelissolo@gmail.com ; un nouveau commit
+   "Sync agenda: ..." apparaît sur GitHub.
 3. La page publique elle-même ne se met à jour qu'après que GitHub Pages
    ait reconstruit le site (en général sous 1-2 minutes après le commit).
-   Le bouton cliqué affiche un état "confirmé" immédiatement côté
-   navigateur, mais un autre visiteur qui recharge la page dans la minute
-   qui suit peut encore voir le créneau comme libre le temps que la
-   publication se propage — le serveur revérifie toujours la disponibilité
-   avant de créer un événement, donc au pire la réservation est refusée
-   avec un message clair, jamais un double événement silencieux.
+   Les jours cochés passent en rouge immédiatement côté navigateur, mais
+   un autre visiteur qui recharge la page dans la minute qui suit peut
+   encore les voir libres le temps que la publication se propage — le
+   serveur revérifie toujours la disponibilité de chaque jour avant de
+   créer les événements, donc au pire la réservation est refusée avec un
+   message clair, jamais un double événement silencieux.
 4. Supprimez l'événement de test dans Google Agenda, puis relancez
    `regenerateAndPublish` une fois pour republier une page propre (ou
    attendez le prochain passage du déclencheur quotidien).
 
 ## Notes de conception
 
-- Le "week-end" est toujours samedi+dimanche (2 jours), cohérent avec le
-  contenu déjà présent dans `index.html`.
+- La page est un agenda mobile mois par mois (pas de contrainte week-end :
+  n'importe quel jour, ou combinaison de jours, peut être sélectionné puis
+  réservé). Chaque jour est vert (libre), rouge (réservé — un tap affiche
+  le prénom dans une bulle) ou bleu (Cannelle à Paris).
+- `index.html` ne contient plus de HTML pré-rendu par jour. Le rendu de la
+  grille est un script statique, jamais régénéré ; seul un petit bloc de
+  données (marqueur `DATA`, à l'intérieur d'un `<script>`) est réécrit par
+  `regenerateAndPublish()` : `WINDOW_START`, `WINDOW_END`, `PARIS_RANGES`
+  et `BOOKINGS`. Si vous voulez changer l'apparence de la grille (couleurs,
+  taille des cases, comportement de la bulle), éditez uniquement le CSS/JS
+  statique de `index.html` — `Code.gs` n'a pas besoin de changer pour ça.
 - La lecture des événements accepte aussi bien un événement "journée
   entière" qu'un événement horodaté pour les visites (`Anna en visite à
   Londres` dans l'agenda actuel est horodaté, pas all-day) — mais toute
   nouvelle réservation créée par `doPost` est systématiquement un
   événement all-day, pour rester cohérent avec la convention déclarée.
-- Les boîtes de dates (Paris et week-ends libres) sont toutes au même
-  gabarit et affichent `JJ/MM–JJ/MM` (`renderParisChip` / `renderFreeChip`
-  / la classe CSS `.date-box`). Si vous éditez ce format, gardez le HTML
-  généré ici et la classe `.date-box` dans `index.html` synchronisés,
-  sinon la prochaine sync quotidienne écrasera vos changements de style
-  avec l'ancien format côté contenu (le HTML sera correct mais le CSS
-  pourrait ne plus matcher si vous avez aussi changé les classes).
+- `doPost` reçoit `{"name": "...", "dates": ["YYYY-MM-DD", ...]}` (jours
+  individuels, pas forcément consécutifs) et regroupe les jours
+  consécutifs pour créer un événement par plage continue.
 
 ## Après une modification de Code.gs
 
-Toute modification de ce fichier (comme celle qui vient d'harmoniser le
-format des boîtes de dates) doit être répercutée à la main dans le projet
-Apps Script existant : rouvrez script.google.com, remplacez le contenu de
-`Code.gs`, enregistrez, puis **Déployer → Gérer les déploiements → ✏️ →
-Nouvelle version → Déployer** pour que le Web App déjà en place serve le
-code à jour (l'URL ne change pas). Sans cette étape, la prochaine
-exécution du déclencheur quotidien republiera la page avec l'**ancien**
-format (deux lignes jour/mois) puisque c'est le code actuellement collé
-dans Apps Script qui tourne, pas ce fichier du repo.
+Toute modification de ce fichier doit être répercutée à la main dans le
+projet Apps Script existant : rouvrez script.google.com, remplacez le
+contenu de `Code.gs`, enregistrez, puis **Déployer → Gérer les
+déploiements → ✏️ → Nouvelle version → Déployer** pour que le Web App
+déjà en place serve le code à jour (l'URL ne change pas). Sans cette
+étape, la prochaine exécution du déclencheur quotidien ou la prochaine
+réservation utilisera l'**ancien** code puisque c'est ce qui est
+actuellement collé dans Apps Script qui tourne, pas ce fichier du repo.
