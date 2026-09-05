@@ -3,12 +3,18 @@
  *
  * Deux responsabilités :
  *  1. regenerateAndPublish() — relit l'agenda Google, recalcule l'état
- *     (séjours Paris / réservations / jours libres) et republie index.html
- *     sur GitHub. Appelée par un déclencheur temporel (voir
- *     installDailyTrigger) ET après chaque réservation.
+ *     (séjours Paris / jours "off" / réservations / jours libres) et
+ *     republie index.html sur GitHub. Appelée par un déclencheur temporel
+ *     (voir installDailyTrigger) ET après chaque réservation.
  *  2. doPost(e) — point d'entrée du Web App public. Reçoit une sélection
  *     d'un ou plusieurs jours depuis la page, crée le ou les événements
  *     dans l'agenda, notifie par email, puis republie la page.
+ *
+ * Conventions d'événements reconnues sur l'agenda principal :
+ *  - "KNL à Paris"                 → séjour à Paris (bleu)
+ *  - "off" (insensible à la casse) → absente/indisponible (gris, non
+ *    réservable) — ex. vacances ailleurs qu'à Londres ou Paris
+ *  - "<Prénom> en visite à Londres" → réservation existante (rouge)
  *
  * La page ne contient plus de HTML pré-rendu par jour : index.html embarque
  * juste un petit bloc de données (marqueur DATA) que le calendrier, écrit une
@@ -33,6 +39,7 @@ const CONFIG = {
   windowMonths: 15, // longueur glissante de la fenêtre à partir du début
   windowLatestEnd: { year: 2028, month: 6, day: 30 }, // fin, jamais après cette date (dernier jour affiché)
   parisEventTitle: 'KNL à Paris',
+  offEventTitle: 'off', // comparé insensible à la casse
   visitTitlePattern: /^(.+?)\s+en visite à Londres$/i,
   maxDatesPerBooking: 60,
 };
@@ -135,14 +142,16 @@ function computeWindow() {
 }
 
 /**
- * Lit l'agenda et calcule l'état complet : séjours Paris, réservations, et
- * l'ensemble des jours libres (freeSet) dans la fenêtre glissante.
+ * Lit l'agenda et calcule l'état complet : séjours Paris, jours "off"
+ * (absente/indisponible), réservations, et l'ensemble des jours libres
+ * (freeSet) dans la fenêtre glissante.
  */
 function computeState() {
   const { windowStart, windowEnd } = computeWindow();
   const events = CalendarApp.getDefaultCalendar().getEvents(windowStart, windowEnd);
 
   const parisRanges = [];
+  const offRanges = [];
   const bookings = [];
 
   events.forEach((ev) => {
@@ -152,6 +161,10 @@ function computeState() {
       parisRanges.push({ start, end });
       return;
     }
+    if (title.toLowerCase() === CONFIG.offEventTitle) {
+      offRanges.push({ start, end });
+      return;
+    }
     const match = title.match(CONFIG.visitTitlePattern);
     if (match) {
       bookings.push({ name: match[1].trim(), start, end });
@@ -159,6 +172,7 @@ function computeState() {
   });
 
   const mergedParis = mergeAdjacentRanges(parisRanges).sort((a, b) => a.start - b.start);
+  const mergedOff = mergeAdjacentRanges(offRanges).sort((a, b) => a.start - b.start);
   const sortedBookings = bookings.sort((a, b) => a.start - b.start);
 
   const covered = new Set();
@@ -168,6 +182,7 @@ function computeState() {
     for (let d = from; d < to; d.setDate(d.getDate() + 1)) covered.add(formatDateKey(d));
   };
   mergedParis.forEach(markCovered);
+  mergedOff.forEach(markCovered);
   sortedBookings.forEach(markCovered);
 
   const freeSet = new Set();
@@ -176,7 +191,7 @@ function computeState() {
     if (!covered.has(key)) freeSet.add(key);
   }
 
-  return { windowStart, windowEnd, parisRanges: mergedParis, bookings: sortedBookings, freeSet };
+  return { windowStart, windowEnd, parisRanges: mergedParis, offRanges: mergedOff, bookings: sortedBookings, freeSet };
 }
 
 function eventDateRange(ev) {
@@ -236,11 +251,13 @@ function publishState(state) {
 
 function buildDataBlock(state) {
   const parisRanges = state.parisRanges.map((r) => [formatDateKey(r.start), formatDateKey(addDays(r.end, -1))]);
+  const offRanges = state.offRanges.map((r) => [formatDateKey(r.start), formatDateKey(addDays(r.end, -1))]);
   const bookings = state.bookings.map((b) => ({ name: b.name, start: formatDateKey(b.start), end: formatDateKey(addDays(b.end, -1)) }));
   return [
     `const WINDOW_START = ${JSON.stringify(formatDateKey(state.windowStart))};`,
     `const WINDOW_END = ${JSON.stringify(formatDateKey(state.windowEnd))};`,
     `const PARIS_RANGES = ${JSON.stringify(parisRanges)};`,
+    `const OFF_RANGES = ${JSON.stringify(offRanges)};`,
     `const BOOKINGS = ${JSON.stringify(bookings)};`,
   ].join('\n      ');
 }

@@ -112,14 +112,21 @@ par l'URL copiée à l'étape 6, puis commit/push sur `main`.
 - La page est un agenda mobile mois par mois (pas de contrainte week-end :
   n'importe quel jour, ou combinaison de jours, peut être sélectionné puis
   réservé). Chaque jour est vert (libre), rouge (réservé — un tap affiche
-  le prénom dans une bulle) ou bleu (Cannelle à Paris).
+  le prénom dans une bulle), bleu (Cannelle à Paris) ou gris (pas là — un
+  tap affiche "Pas là").
+- Le statut "pas là" est alimenté par un événement d'agenda dont le titre
+  est exactement `off` (comparé insensible à la casse — `Off`, `OFF`...
+  fonctionnent aussi), journée entière ou horodaté. Ces jours sont grisés
+  et retirés de `freeSet` : impossible de les réserver, comme pour un
+  séjour Paris.
 - `index.html` ne contient plus de HTML pré-rendu par jour. Le rendu de la
   grille est un script statique, jamais régénéré ; seul un petit bloc de
   données (marqueur `DATA`, à l'intérieur d'un `<script>`) est réécrit par
-  `regenerateAndPublish()` : `WINDOW_START`, `WINDOW_END`, `PARIS_RANGES`
-  et `BOOKINGS`. Si vous voulez changer l'apparence de la grille (couleurs,
-  taille des cases, comportement de la bulle), éditez uniquement le CSS/JS
-  statique de `index.html` — `Code.gs` n'a pas besoin de changer pour ça.
+  `regenerateAndPublish()` : `WINDOW_START`, `WINDOW_END`, `PARIS_RANGES`,
+  `OFF_RANGES` et `BOOKINGS`. Si vous voulez changer l'apparence de la
+  grille (couleurs, taille des cases, comportement de la bulle), éditez
+  uniquement le CSS/JS statique de `index.html` — `Code.gs` n'a pas besoin
+  de changer pour ça.
 - La lecture des événements accepte aussi bien un événement "journée
   entière" qu'un événement horodaté pour les visites (`Anna en visite à
   Londres` dans l'agenda actuel est horodaté, pas all-day) — mais toute
