@@ -17,6 +17,8 @@
     --taken-soft: #f8e1e4;
     --paris: #3f5f96;
     --paris-soft: #e3e8f4;
+    --off: #8a7a74;
+    --off-soft: #ece4e0;
 
     --shadow: rgba(120, 70, 60, 0.14);
   }
@@ -37,6 +39,8 @@
       --taken-soft: #4a2529;
       --paris: #8fa8dd;
       --paris-soft: #293a5c;
+      --off: #b5a89f;
+      --off-soft: #3a322e;
 
       --shadow: rgba(0, 0, 0, 0.4);
     }
@@ -56,6 +60,8 @@
     --taken-soft: #4a2529;
     --paris: #8fa8dd;
     --paris-soft: #293a5c;
+    --off: #b5a89f;
+    --off-soft: #3a322e;
 
     --shadow: rgba(0, 0, 0, 0.4);
   }
@@ -179,6 +185,7 @@
   .day-free { background: var(--free-soft); color: var(--free); cursor: pointer; }
   .day-taken { background: var(--taken-soft); color: var(--taken); cursor: pointer; }
   .day-paris { background: var(--paris-soft); color: var(--paris); cursor: pointer; }
+  .day-off { background: var(--off-soft); color: var(--off); cursor: pointer; }
   button.day:active { transform: scale(0.94); }
   button.day:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
   button.day:disabled { opacity: 0.6; }
@@ -214,6 +221,7 @@
     box-shadow: 0 8px 20px var(--shadow);
   }
   .popover.popover-paris { background: var(--paris); }
+  .popover.popover-off { background: var(--off); }
   .popover::after {
     content: '';
     position: absolute;
@@ -225,8 +233,10 @@
   }
   .popover:not(.popover-below)::after { top: 100%; border-top: 6px solid var(--taken); }
   .popover.popover-paris:not(.popover-below)::after { border-top-color: var(--paris); }
+  .popover.popover-off:not(.popover-below)::after { border-top-color: var(--off); }
   .popover.popover-below::after { bottom: 100%; border-bottom: 6px solid var(--taken); }
   .popover.popover-below.popover-paris::after { border-bottom-color: var(--paris); }
+  .popover.popover-below.popover-off::after { border-bottom-color: var(--off); }
 
   .actionbar {
     position: fixed;
@@ -367,6 +377,7 @@
     <div class="legend-item"><span class="legend-dot" style="background: var(--free)"></span>Libre</div>
     <div class="legend-item"><span class="legend-dot" style="background: var(--taken)"></span>Réservé</div>
     <div class="legend-item"><span class="legend-dot" style="background: var(--paris)"></span>Cannelle à Paris</div>
+    <div class="legend-item"><span class="legend-dot" style="background: var(--off)"></span>Pas là</div>
   </div>
 
   <div id="calendar"></div>
@@ -408,7 +419,8 @@
   <!-- DATA_START -->
       const WINDOW_START = "2026-11-14";
       const WINDOW_END = "2028-02-14";
-      const PARIS_RANGES = [["2026-11-27","2026-11-29"],["2026-12-04","2026-12-06"],["2026-12-24","2027-01-02"],["2027-01-14","2027-01-17"],["2027-01-22","2027-01-24"],["2027-02-26","2027-02-28"],["2027-03-25","2027-03-29"],["2027-04-16","2027-04-18"],["2027-04-30","2027-05-03"]];
+      const PARIS_RANGES = [["2026-11-27","2026-11-29"],["2026-12-04","2026-12-06"],["2026-12-24","2027-01-02"],["2027-01-14","2027-01-17"],["2027-01-22","2027-01-24"],["2027-02-26","2027-02-28"],["2027-03-25","2027-03-29"],["2027-04-16","2027-04-18"],["2027-04-30","2027-05-03"],["2027-05-27","2027-05-31"],["2027-07-01","2027-07-04"]];
+      const OFF_RANGES = [];
       const BOOKINGS = [{"name":"Anna","start":"2026-11-14","end":"2026-11-16"},{"name":"Thaïs","start":"2027-01-09","end":"2027-01-10"},{"name":"cyril","start":"2027-05-08","end":"2027-05-09"}];
       <!-- DATA_END -->
 </script>
@@ -460,6 +472,7 @@
   function statusOf(key) {
     if (key < WINDOW_START || key >= WINDOW_END) return { type: 'muted' };
     for (const [s, e] of PARIS_RANGES) if (inRange(key, s, e)) return { type: 'paris' };
+    for (const [s, e] of OFF_RANGES) if (inRange(key, s, e)) return { type: 'off' };
     for (const b of BOOKINGS) if (inRange(key, b.start, b.end)) return { type: 'taken', name: b.name };
     return { type: 'free' };
   }
@@ -474,6 +487,9 @@
     }
     if (status.type === 'paris') {
       return `<button type="button" class="day day-paris" data-key="${key}" data-kind="paris" aria-label="${dayNum}, Cannelle à Paris">${dayNum}</button>`;
+    }
+    if (status.type === 'off') {
+      return `<button type="button" class="day day-off" data-key="${key}" data-kind="off" aria-label="${dayNum}, pas là">${dayNum}</button>`;
     }
     if (status.type === 'taken') {
       return `<button type="button" class="day day-taken" data-key="${key}" data-kind="taken" data-name="${status.name}" aria-label="${dayNum}, réservé par ${status.name}">${dayNum}</button>`;
@@ -516,7 +532,7 @@
   function showPopover(anchor, text, kind) {
     const pop = document.getElementById('popover');
     pop.textContent = text;
-    pop.className = `popover${kind === 'paris' ? ' popover-paris' : ''}`;
+    pop.className = `popover${kind === 'paris' ? ' popover-paris' : kind === 'off' ? ' popover-off' : ''}`;
     pop.hidden = false;
     const rect = anchor.getBoundingClientRect();
     const popRect = pop.getBoundingClientRect();
@@ -558,7 +574,8 @@
       if (!pop.hidden && pop.dataset.openFor === btn.dataset.key) {
         hidePopover();
       } else {
-        showPopover(btn, kind === 'taken' ? btn.dataset.name : 'Cannelle à Paris', kind);
+        const text = kind === 'taken' ? btn.dataset.name : kind === 'paris' ? 'Cannelle à Paris' : 'Pas là';
+        showPopover(btn, text, kind);
       }
     }
   });
