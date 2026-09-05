@@ -197,6 +197,17 @@
     padding: 10px 8px;
     min-width: 84px;
     text-align: center;
+    border: none;
+    font: inherit;
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.15s ease;
+  }
+  .chip:hover:not(:disabled) {
+    box-shadow: 0 4px 12px var(--shadow);
+    transform: translateY(-1px);
+  }
+  .chip:disabled {
+    cursor: default;
   }
   .chip .chip-dates {
     font-family: 'Fraunces', serif;
@@ -209,6 +220,15 @@
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--text-muted);
+  }
+  .chip.chip-confirmed {
+    background: var(--taken-soft);
+  }
+  .chip.chip-confirmed .chip-dates {
+    color: var(--taken);
+  }
+  .chip.chip-pending {
+    opacity: 0.6;
   }
 
   .cta {
@@ -297,27 +317,80 @@
     <p class="section-sub"><!-- FREECOUNT_START -->14 week-ends encore sans plan, entre le 14 novembre 2026 et le 14 mai 2027.<!-- FREECOUNT_END --></p>
     <div class="chip-grid">
       <!-- FREE_START -->
-      <div class="chip"><span class="chip-dates">21–22</span><span class="chip-month">Nov.</span></div>
-      <div class="chip"><span class="chip-dates">12–13</span><span class="chip-month">Déc.</span></div>
-      <div class="chip"><span class="chip-dates">19–20</span><span class="chip-month">Déc.</span></div>
-      <div class="chip"><span class="chip-dates">30–31</span><span class="chip-month">Janv.</span></div>
-      <div class="chip"><span class="chip-dates">6–7</span><span class="chip-month">Févr.</span></div>
-      <div class="chip"><span class="chip-dates">13–14</span><span class="chip-month">Févr.</span></div>
-      <div class="chip"><span class="chip-dates">20–21</span><span class="chip-month">Févr.</span></div>
-      <div class="chip"><span class="chip-dates">6–7</span><span class="chip-month">Mars</span></div>
-      <div class="chip"><span class="chip-dates">13–14</span><span class="chip-month">Mars</span></div>
-      <div class="chip"><span class="chip-dates">20–21</span><span class="chip-month">Mars</span></div>
-      <div class="chip"><span class="chip-dates">3–4</span><span class="chip-month">Avr.</span></div>
-      <div class="chip"><span class="chip-dates">10–11</span><span class="chip-month">Avr.</span></div>
-      <div class="chip"><span class="chip-dates">24–25</span><span class="chip-month">Avr.</span></div>
-      <div class="chip"><span class="chip-dates">8–9</span><span class="chip-month">Mai</span></div>
+      <button type="button" class="chip" data-start="2026-11-21" data-end="2026-11-23" data-label="21–22 Nov."><span class="chip-dates">21–22</span><span class="chip-month">Nov.</span></button>
+      <button type="button" class="chip" data-start="2026-12-12" data-end="2026-12-14" data-label="12–13 Déc."><span class="chip-dates">12–13</span><span class="chip-month">Déc.</span></button>
+      <button type="button" class="chip" data-start="2026-12-19" data-end="2026-12-21" data-label="19–20 Déc."><span class="chip-dates">19–20</span><span class="chip-month">Déc.</span></button>
+      <button type="button" class="chip" data-start="2027-01-30" data-end="2027-02-01" data-label="30–31 Janv."><span class="chip-dates">30–31</span><span class="chip-month">Janv.</span></button>
+      <button type="button" class="chip" data-start="2027-02-06" data-end="2027-02-08" data-label="6–7 Févr."><span class="chip-dates">6–7</span><span class="chip-month">Févr.</span></button>
+      <button type="button" class="chip" data-start="2027-02-13" data-end="2027-02-15" data-label="13–14 Févr."><span class="chip-dates">13–14</span><span class="chip-month">Févr.</span></button>
+      <button type="button" class="chip" data-start="2027-02-20" data-end="2027-02-22" data-label="20–21 Févr."><span class="chip-dates">20–21</span><span class="chip-month">Févr.</span></button>
+      <button type="button" class="chip" data-start="2027-03-06" data-end="2027-03-08" data-label="6–7 Mars"><span class="chip-dates">6–7</span><span class="chip-month">Mars</span></button>
+      <button type="button" class="chip" data-start="2027-03-13" data-end="2027-03-15" data-label="13–14 Mars"><span class="chip-dates">13–14</span><span class="chip-month">Mars</span></button>
+      <button type="button" class="chip" data-start="2027-03-20" data-end="2027-03-22" data-label="20–21 Mars"><span class="chip-dates">20–21</span><span class="chip-month">Mars</span></button>
+      <button type="button" class="chip" data-start="2027-04-03" data-end="2027-04-05" data-label="3–4 Avr."><span class="chip-dates">3–4</span><span class="chip-month">Avr.</span></button>
+      <button type="button" class="chip" data-start="2027-04-10" data-end="2027-04-12" data-label="10–11 Avr."><span class="chip-dates">10–11</span><span class="chip-month">Avr.</span></button>
+      <button type="button" class="chip" data-start="2027-04-24" data-end="2027-04-26" data-label="24–25 Avr."><span class="chip-dates">24–25</span><span class="chip-month">Avr.</span></button>
+      <button type="button" class="chip" data-start="2027-05-08" data-end="2027-05-10" data-label="8–9 Mai"><span class="chip-dates">8–9</span><span class="chip-month">Mai</span></button>
       <!-- FREE_END -->
     </div>
   </section>
 
-  <div class="cta">Un de ces week-ends te tente ? Dis-le-moi et on cale ça 💌</div>
+  <div class="cta">Un de ces week-ends te tente ? Clique dessus, ou dis-le-moi et on cale ça 💌</div>
 
   <footer><!-- FOOTER_START -->Dernière mise à jour : samedi 5 septembre 2026 — fenêtre glissante de 6 mois à partir du 14 novembre 2026<!-- FOOTER_END --></footer>
 </main>
+
+<script>
+  // URL du Web App Google Apps Script (déploiement "Exécuter en tant que : Moi",
+  // accès "Tous"). Voir apps-script/README.md pour la procédure de déploiement.
+  const WEBAPP_URL = 'REPLACE_WITH_YOUR_APPS_SCRIPT_WEB_APP_URL';
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  document.querySelectorAll('.chip-grid').forEach((grid) => {
+    grid.addEventListener('click', async (e) => {
+      const btn = e.target.closest('button.chip[data-start]');
+      if (!btn || btn.disabled) return;
+      if (WEBAPP_URL.startsWith('REPLACE_')) {
+        alert("La réservation en ligne n'est pas encore configurée — préviens directement par message pour ce week-end.");
+        return;
+      }
+
+      const label = btn.dataset.label;
+      const name = (prompt(`Ton prénom, pour le week-end du ${label} ?`) || '').trim();
+      if (!name) return;
+
+      const original = btn.innerHTML;
+      btn.disabled = true;
+      btn.classList.add('chip-pending');
+
+      try {
+        const res = await fetch(WEBAPP_URL, {
+          method: 'POST',
+          // text/plain évite le preflight CORS que les Web Apps Apps Script gèrent mal.
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ name, start: btn.dataset.start, end: btn.dataset.end }),
+        });
+        const data = await res.json();
+        btn.classList.remove('chip-pending');
+        if (data.ok) {
+          btn.classList.add('chip-confirmed');
+          btn.innerHTML = `<span class="chip-dates">✓ ${escapeHtml(name)}</span><span class="chip-month">Confirmé</span>`;
+        } else {
+          alert(data.message || "Ce week-end vient d'être pris, désolé ! Recharge la page.");
+          btn.disabled = false;
+          btn.innerHTML = original;
+        }
+      } catch (err) {
+        btn.classList.remove('chip-pending');
+        alert('Erreur réseau, réessaie dans un instant.');
+        btn.disabled = false;
+        btn.innerHTML = original;
+      }
+    });
+  });
+</script>
 
 </body></html>
