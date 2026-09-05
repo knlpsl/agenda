@@ -1,0 +1,323 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){display:none!important}</style></head><body>
+<title>Viens me voir à Londres</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --bg: #fbf0ec;
+    --surface: #ffffff;
+    --surface-2: #f6e3dc;
+    --border: #ecd9cf;
+    --text: #3a2b2c;
+    --text-muted: #9a827e;
+    --free: #cf4f74;
+    --free-soft: #fbe1e8;
+    --paris: #4c3c68;
+    --paris-soft: #e9e2f1;
+    --taken: #b9821f;
+    --taken-soft: #f5e7c8;
+    --shadow: rgba(120, 70, 60, 0.10);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #241a1d;
+      --surface: #2d2124;
+      --surface-2: #38292c;
+      --border: #4a373b;
+      --text: #f5e9e6;
+      --text-muted: #bda29d;
+      --free: #ec7c9b;
+      --free-soft: #402530;
+      --paris: #a695d0;
+      --paris-soft: #362d4a;
+      --taken: #e0b45a;
+      --taken-soft: #40331a;
+      --shadow: rgba(0, 0, 0, 0.3);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #241a1d;
+    --surface: #2d2124;
+    --surface-2: #38292c;
+    --border: #4a373b;
+    --text: #f5e9e6;
+    --text-muted: #bda29d;
+    --free: #ec7c9b;
+    --free-soft: #402530;
+    --paris: #a695d0;
+    --paris-soft: #362d4a;
+    --taken: #e0b45a;
+    --taken-soft: #40331a;
+    --shadow: rgba(0, 0, 0, 0.3);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    padding: clamp(18px, 5vw, 60px);
+    display: flex;
+    justify-content: center;
+  }
+  main { width: 100%; max-width: 700px; }
+
+  header {
+    margin-bottom: 30px;
+  }
+  .route-mark {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+  .route-mark svg { flex-shrink: 0; }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(30px, 6.5vw, 46px);
+    line-height: 1.05;
+    margin: 0 0 10px;
+    text-wrap: balance;
+  }
+  .lede {
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.6;
+    max-width: 52ch;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 22px 0 34px;
+    padding: 14px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 4px 14px var(--shadow);
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+  }
+  .legend-dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  }
+
+  section { margin-bottom: 34px; }
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 20px;
+    margin: 0 0 4px;
+  }
+  .section-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0 0 14px;
+  }
+
+  .taken-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--taken-soft);
+    border-radius: 12px;
+    padding: 13px 16px;
+    font-size: 14px;
+  }
+  .taken-card strong { font-weight: 600; }
+  .taken-card .tag {
+    margin-left: auto;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--taken);
+    background: var(--surface);
+    padding: 3px 9px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .paris-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .paris-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    background: var(--paris-soft);
+    border-radius: 12px;
+    padding: 10px 12px;
+    min-width: 92px;
+    text-align: center;
+  }
+  .paris-chip .dates {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--paris);
+    white-space: nowrap;
+  }
+  .paris-chip .note {
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .chip-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    background: var(--free-soft);
+    border-radius: 12px;
+    padding: 10px 8px;
+    min-width: 84px;
+    text-align: center;
+  }
+  .chip .chip-dates {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--free);
+  }
+  .chip .chip-month {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .cta {
+    margin-top: 6px;
+    padding: 18px 20px;
+    background: var(--paris-soft);
+    border-radius: 14px;
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    color: var(--text);
+    text-align: center;
+  }
+
+  footer {
+    margin-top: 30px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    font-size: 11.5px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  @media (max-width: 480px) {
+    .chip { min-width: 74px; padding: 8px 6px; }
+    .paris-chip { min-width: 74px; padding: 8px 6px; }
+  }
+</style>
+
+<main>
+  <header>
+    <div class="route-mark">
+      <svg width="26" height="10" viewBox="0 0 26 10" fill="none">
+        <circle cx="2" cy="5" r="2" fill="currentColor"/>
+        <line x1="5" y1="5" x2="21" y2="5" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 2"/>
+        <circle cx="24" cy="5" r="2" fill="currentColor"/>
+      </svg>
+      Londres · Paris
+    </div>
+    <h1>Viens me voir à Londres</h1>
+    <p class="lede">Voici mes prochains six mois : quand je serai à Paris, et surtout — quels week-ends sont encore libres pour que tu passes me voir. Repère une date et préviens-moi !</p>
+  </header>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background: var(--free)"></span>Libre — viens !</div>
+    <div class="legend-item"><span class="legend-dot" style="background: var(--taken)"></span>Déjà prévu</div>
+    <div class="legend-item"><span class="legend-dot" style="background: var(--paris)"></span>Je suis à Paris</div>
+  </div>
+
+  <!-- TAKEN_START -->
+  <section>
+    <h2>Déjà prévu</h2>
+    <p class="section-sub">Ce week-end a déjà un visiteur.</p>
+    <div class="taken-card">
+      <span>🎉</span>
+      <span><strong>Anna</strong> vient du 14 au 16 novembre 2026</span>
+      <span class="tag">Complet</span>
+    </div>
+    <div class="taken-card">
+      <span>🎉</span>
+      <span><strong>Thaïs</strong> vient du 9 au 10 janvier 2027</span>
+      <span class="tag">Complet</span>
+    </div>
+  </section>
+  <!-- TAKEN_END -->
+
+  <section>
+    <h2>Je suis à Paris</h2>
+    <p class="section-sub">Pas la peine de passer à Londres ces jours-là — mais si toi aussi tu es à Paris...</p>
+    <div class="paris-list">
+      <!-- PARIS_START -->
+      <div class="paris-chip"><span class="dates">27–29</span><span class="note">Nov.</span></div>
+      <div class="paris-chip"><span class="dates">4–6</span><span class="note">Déc.</span></div>
+      <div class="paris-chip"><span class="dates">24 déc.–2 janv.</span><span class="note">Fêtes</span></div>
+      <div class="paris-chip"><span class="dates">14–17</span><span class="note">Janv.</span></div>
+      <div class="paris-chip"><span class="dates">22–24</span><span class="note">Janv.</span></div>
+      <div class="paris-chip"><span class="dates">26–28</span><span class="note">Févr.</span></div>
+      <div class="paris-chip"><span class="dates">25–29</span><span class="note">Mars</span></div>
+      <div class="paris-chip"><span class="dates">16–18</span><span class="note">Avr.</span></div>
+      <div class="paris-chip"><span class="dates">30 avr.–3 mai</span><span class="note">2027</span></div>
+      <!-- PARIS_END -->
+    </div>
+  </section>
+
+  <section>
+    <h2>Week-ends libres pour venir</h2>
+    <p class="section-sub"><!-- FREECOUNT_START -->14 week-ends encore sans plan, entre le 14 novembre 2026 et le 14 mai 2027.<!-- FREECOUNT_END --></p>
+    <div class="chip-grid">
+      <!-- FREE_START -->
+      <div class="chip"><span class="chip-dates">21–22</span><span class="chip-month">Nov.</span></div>
+      <div class="chip"><span class="chip-dates">12–13</span><span class="chip-month">Déc.</span></div>
+      <div class="chip"><span class="chip-dates">19–20</span><span class="chip-month">Déc.</span></div>
+      <div class="chip"><span class="chip-dates">30–31</span><span class="chip-month">Janv.</span></div>
+      <div class="chip"><span class="chip-dates">6–7</span><span class="chip-month">Févr.</span></div>
+      <div class="chip"><span class="chip-dates">13–14</span><span class="chip-month">Févr.</span></div>
+      <div class="chip"><span class="chip-dates">20–21</span><span class="chip-month">Févr.</span></div>
+      <div class="chip"><span class="chip-dates">6–7</span><span class="chip-month">Mars</span></div>
+      <div class="chip"><span class="chip-dates">13–14</span><span class="chip-month">Mars</span></div>
+      <div class="chip"><span class="chip-dates">20–21</span><span class="chip-month">Mars</span></div>
+      <div class="chip"><span class="chip-dates">3–4</span><span class="chip-month">Avr.</span></div>
+      <div class="chip"><span class="chip-dates">10–11</span><span class="chip-month">Avr.</span></div>
+      <div class="chip"><span class="chip-dates">24–25</span><span class="chip-month">Avr.</span></div>
+      <div class="chip"><span class="chip-dates">8–9</span><span class="chip-month">Mai</span></div>
+      <!-- FREE_END -->
+    </div>
+  </section>
+
+  <div class="cta">Un de ces week-ends te tente ? Dis-le-moi et on cale ça 💌</div>
+
+  <footer><!-- FOOTER_START -->Dernière mise à jour : samedi 5 septembre 2026 — fenêtre glissante de 6 mois à partir du 14 novembre 2026<!-- FOOTER_END --></footer>
+</main>
+
+</body></html>
