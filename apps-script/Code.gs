@@ -29,8 +29,9 @@ const CONFIG = {
   githubFilePath: 'index.html',
   notifyEmail: 'c.pelissolo@gmail.com',
   timeZone: 'Europe/Paris',
-  windowAnchor: { year: 2026, month: 11, day: 14 }, // 1-indexed month
-  windowMonths: 6,
+  windowAnchor: { year: 2026, month: 11, day: 14 }, // début, jamais avant cette date (1-indexed month)
+  windowMonths: 15, // longueur glissante de la fenêtre à partir du début
+  windowLatestEnd: { year: 2028, month: 6, day: 30 }, // fin, jamais après cette date (dernier jour affiché)
   parisEventTitle: 'KNL à Paris',
   visitTitlePattern: /^(.+?)\s+en visite à Londres$/i,
   maxDatesPerBooking: 60,
@@ -122,8 +123,14 @@ function computeWindow() {
   const anchor = new Date(CONFIG.windowAnchor.year, CONFIG.windowAnchor.month - 1, CONFIG.windowAnchor.day);
   const today = dateOnly(new Date(), tz);
   const windowStart = today > anchor ? today : anchor;
-  const windowEnd = new Date(windowStart);
-  windowEnd.setMonth(windowEnd.getMonth() + CONFIG.windowMonths);
+
+  const rollingEnd = new Date(windowStart);
+  rollingEnd.setMonth(rollingEnd.getMonth() + CONFIG.windowMonths);
+
+  const latestLastDay = new Date(CONFIG.windowLatestEnd.year, CONFIG.windowLatestEnd.month - 1, CONFIG.windowLatestEnd.day);
+  const latestEnd = addDays(latestLastDay, 1); // exclusif
+
+  const windowEnd = rollingEnd < latestEnd ? rollingEnd : latestEnd;
   return { windowStart, windowEnd };
 }
 
@@ -214,14 +221,12 @@ function groupConsecutive(sortedKeys) {
 
 function publishState(state) {
   const dataBlock = buildDataBlock(state);
-  const freeCount = state.freeSet.size;
-  const freecountText = `${freeCount} jour${freeCount === 1 ? '' : 's'} encore libre${freeCount === 1 ? '' : 's'}, entre le ${formatFullDate(state.windowStart)} et le ${formatFullDate(state.windowEnd)}.`;
-  const footerText = `Dernière mise à jour : ${formatFullDateWithWeekday(new Date())} — fenêtre glissante de 6 mois à partir du ${formatFullDate(state.windowStart)}`;
+  const lastDayShown = addDays(state.windowEnd, -1);
+  const footerText = `Dernière mise à jour : ${formatFullDateWithWeekday(new Date())} — calendrier affiché du ${formatFullDate(state.windowStart)} au ${formatFullDate(lastDayShown)}`;
 
   const current = ghGetFile();
   let html = current.content;
   html = replaceBetweenMarkers(html, 'DATA', dataBlock);
-  html = replaceBetweenMarkers(html, 'FREECOUNT', freecountText);
   html = replaceBetweenMarkers(html, 'FOOTER', footerText);
 
   if (html === current.content) return; // rien à publier
