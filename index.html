@@ -115,25 +115,28 @@
 
   .legend {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px 16px;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: 6px;
     margin: 18px 0 24px;
-    padding: 10px 14px;
+    padding: 10px 12px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
     box-shadow: 0 3px 10px var(--shadow);
+    overflow-x: auto;
   }
   .legend-item {
     display: flex;
     align-items: center;
-    gap: 7px;
-    font-size: 12px;
+    gap: 5px;
+    font-size: 11px;
     font-weight: 500;
     color: var(--text-muted);
+    white-space: nowrap;
   }
   .legend-dot {
-    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
   }
 
   .month + .month { margin-top: 26px; }
@@ -370,7 +373,7 @@
       Cannou et ses amis
     </div>
     <h1>Envie de passer à Londres ?</h1>
-    <p class="lede">Voici un site synchronisé avec mon agenda, qui te permettra de savoir quand je suis à Paris, et quels sont les jours pendant lesquels tu es le/la bienvenue(e). Sélectionne des jours disponibles et réserve un séjour londonien à la maison ! Ou pas à la maison si chez moi ça sent mauvais. Quand tu valides, une synchro de quelques minutes a lieu et mon agenda se met à jour.</p>
+    <p class="lede">Voici un site synchronisé avec mon agenda, qui te permettra de savoir quand je suis à Paris, et quels sont les jours pendant lesquels tu es le/la bienvenu(e). Sélectionne des jours disponibles et réserve un séjour londonien à la maison ! Ou pas à la maison si chez moi ça sent mauvais. Quand tu valides, une synchro de quelques minutes a lieu et mon agenda se met à jour.</p>
   </header>
 
   <div class="legend">
