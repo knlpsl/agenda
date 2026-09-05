@@ -34,10 +34,6 @@ const FR_MONTHS_FULL = [
   'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
   'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre',
 ];
-const FR_MONTHS_SHORT = [
-  'Janv.', 'Févr.', 'Mars', 'Avr.', 'Mai', 'Juin',
-  'Juil.', 'Août', 'Sept.', 'Oct.', 'Nov.', 'Déc.',
-];
 const FR_WEEKDAYS = [
   'dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi',
 ];
@@ -188,8 +184,6 @@ function enumerateWeekends(windowStart, windowEnd) {
       end: mondayExclusive, // exclusive, cohérent avec le format all-day de Calendar
       startKey: formatDateKey(saturday),
       endKey: formatDateKey(mondayExclusive),
-      label: formatWeekendLabel(saturday, sunday),
-      monthLabel: FR_MONTHS_SHORT[sunday.getMonth()],
     });
     cursor.setDate(cursor.getDate() + 7);
   }
@@ -269,16 +263,20 @@ function renderTakenCard(t) {
 
 function renderParisChip(range) {
   const lastDay = addDays(range.end, -1);
-  const sameMonth = range.start.getMonth() === lastDay.getMonth() && range.start.getFullYear() === lastDay.getFullYear();
-  const sameYear = range.start.getFullYear() === lastDay.getFullYear();
-  const startLabel = sameMonth ? `${range.start.getDate()}` : `${range.start.getDate()} ${FR_MONTHS_SHORT[range.start.getMonth()].toLowerCase()}`;
-  const endLabel = `${lastDay.getDate()}${sameMonth ? '' : ' ' + FR_MONTHS_SHORT[lastDay.getMonth()].toLowerCase()}`;
-  const note = sameMonth ? FR_MONTHS_SHORT[range.start.getMonth()] : (sameYear ? FR_MONTHS_SHORT[lastDay.getMonth()] : String(lastDay.getFullYear()));
-  return `<div class="paris-chip"><span class="dates">${startLabel}–${endLabel}</span><span class="note">${note}</span></div>`;
+  return `<div class="date-box date-box-paris">${ddmmRange(range.start, lastDay)}</div>`;
 }
 
 function renderFreeChip(w) {
-  return `<button type="button" class="chip" data-start="${w.startKey}" data-end="${w.endKey}" data-label="${w.label} ${w.monthLabel}"><span class="chip-dates">${w.label}</span><span class="chip-month">${w.monthLabel}</span></button>`;
+  const label = ddmmRange(w.start, addDays(w.end, -1));
+  return `<button type="button" class="date-box" data-start="${w.startKey}" data-end="${w.endKey}" data-label="${label}">${label}</button>`;
+}
+
+/** "JJ/MM–JJ/MM" pour un intervalle inclusif [start, endInclusive]. */
+function ddmmRange(start, endInclusive) {
+  return `${formatDDMM(start)}–${formatDDMM(endInclusive)}`;
+}
+function formatDDMM(d) {
+  return Utilities.formatDate(d, CONFIG.timeZone, 'dd/MM');
 }
 
 // ---- GitHub Contents API ----------------------------------------------------
@@ -329,7 +327,7 @@ function ghHeaders() {
 // ---- Notification ------------------------------------------------------------
 
 function notifyNewBooking(name, weekend) {
-  const label = weekend ? `${weekend.label} ${weekend.monthLabel}` : '(date inconnue)';
+  const label = weekend ? ddmmRange(weekend.start, addDays(weekend.end, -1)) : '(date inconnue)';
   MailApp.sendEmail({
     to: CONFIG.notifyEmail,
     subject: `Nouvelle visite à Londres : ${name}`,
@@ -354,9 +352,6 @@ function addDays(d, n) {
   const copy = new Date(d);
   copy.setDate(copy.getDate() + n);
   return copy;
-}
-function formatWeekendLabel(saturday, sunday) {
-  return `${saturday.getDate()}–${sunday.getDate()}`;
 }
 function formatDayMonth(d) {
   return `${d.getDate()} ${FR_MONTHS_FULL[d.getMonth()]}`;

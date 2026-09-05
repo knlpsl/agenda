@@ -155,79 +155,52 @@
     flex-wrap: wrap;
     gap: 10px;
   }
-  .paris-chip {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1px;
-    background: var(--paris-soft);
-    border-radius: 12px;
-    padding: 10px 12px;
-    min-width: 92px;
-    text-align: center;
-  }
-  .paris-chip .dates {
-    font-family: 'Fraunces', serif;
-    font-weight: 600;
-    font-size: 15px;
-    color: var(--paris);
-    white-space: nowrap;
-  }
-  .paris-chip .note {
-    font-size: 10px;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-
   .chip-grid {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
   }
-  .chip {
+
+  /* Boîte de date unique, même gabarit partout (Paris comme week-ends libres) */
+  .date-box {
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 1px;
-    background: var(--free-soft);
-    border-radius: 12px;
-    padding: 10px 8px;
-    min-width: 84px;
-    text-align: center;
+    width: 128px;
+    height: 44px;
+    padding: 0;
+    margin: 0;
     border: none;
-    font: inherit;
+    border-radius: 12px;
+    background: var(--free-soft);
+    color: var(--free);
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    text-align: center;
+  }
+  .date-box.date-box-paris {
+    background: var(--paris-soft);
+    color: var(--paris);
+  }
+  button.date-box {
     cursor: pointer;
     transition: transform 0.1s ease, box-shadow 0.15s ease;
   }
-  .chip:hover:not(:disabled) {
+  button.date-box:hover:not(:disabled) {
     box-shadow: 0 4px 12px var(--shadow);
     transform: translateY(-1px);
   }
-  .chip:disabled {
+  button.date-box:disabled {
     cursor: default;
   }
-  .chip .chip-dates {
-    font-family: 'Fraunces', serif;
-    font-weight: 600;
-    font-size: 15px;
-    color: var(--free);
-  }
-  .chip .chip-month {
-    font-size: 10px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-  .chip.chip-confirmed {
+  .date-box.date-box-confirmed {
     background: var(--taken-soft);
-  }
-  .chip.chip-confirmed .chip-dates {
     color: var(--taken);
   }
-  .chip.chip-pending {
+  .date-box.date-box-pending {
     opacity: 0.6;
   }
 
@@ -252,8 +225,7 @@
   }
 
   @media (max-width: 480px) {
-    .chip { min-width: 74px; padding: 8px 6px; }
-    .paris-chip { min-width: 74px; padding: 8px 6px; }
+    .date-box { width: 104px; height: 40px; font-size: 12.5px; }
   }
 </style>
 
@@ -300,15 +272,15 @@
     <p class="section-sub">Pas la peine de passer à Londres ces jours-là — mais si toi aussi tu es à Paris...</p>
     <div class="paris-list">
       <!-- PARIS_START -->
-      <div class="paris-chip"><span class="dates">27–29</span><span class="note">Nov.</span></div>
-      <div class="paris-chip"><span class="dates">4–6</span><span class="note">Déc.</span></div>
-      <div class="paris-chip"><span class="dates">24 déc.–2 janv.</span><span class="note">2027</span></div>
-      <div class="paris-chip"><span class="dates">14–17</span><span class="note">Janv.</span></div>
-      <div class="paris-chip"><span class="dates">22–24</span><span class="note">Janv.</span></div>
-      <div class="paris-chip"><span class="dates">26–28</span><span class="note">Févr.</span></div>
-      <div class="paris-chip"><span class="dates">25–29</span><span class="note">Mars</span></div>
-      <div class="paris-chip"><span class="dates">16–18</span><span class="note">Avr.</span></div>
-      <div class="paris-chip"><span class="dates">30 avr.–3 mai</span><span class="note">Mai</span></div>
+      <div class="date-box date-box-paris">27/11–29/11</div>
+      <div class="date-box date-box-paris">04/12–06/12</div>
+      <div class="date-box date-box-paris">24/12–02/01</div>
+      <div class="date-box date-box-paris">14/01–17/01</div>
+      <div class="date-box date-box-paris">22/01–24/01</div>
+      <div class="date-box date-box-paris">26/02–28/02</div>
+      <div class="date-box date-box-paris">25/03–29/03</div>
+      <div class="date-box date-box-paris">16/04–18/04</div>
+      <div class="date-box date-box-paris">30/04–03/05</div>
       <!-- PARIS_END -->
     </div>
   </section>
@@ -320,19 +292,19 @@
       <!-- FREECOUNT_END --></p>
     <div class="chip-grid">
       <!-- FREE_START -->
-      <button type="button" class="chip" data-start="2026-11-21" data-end="2026-11-23" data-label="21–22 Nov."><span class="chip-dates">21–22</span><span class="chip-month">Nov.</span></button>
-      <button type="button" class="chip" data-start="2026-12-12" data-end="2026-12-14" data-label="12–13 Déc."><span class="chip-dates">12–13</span><span class="chip-month">Déc.</span></button>
-      <button type="button" class="chip" data-start="2026-12-19" data-end="2026-12-21" data-label="19–20 Déc."><span class="chip-dates">19–20</span><span class="chip-month">Déc.</span></button>
-      <button type="button" class="chip" data-start="2027-01-30" data-end="2027-02-01" data-label="30–31 Janv."><span class="chip-dates">30–31</span><span class="chip-month">Janv.</span></button>
-      <button type="button" class="chip" data-start="2027-02-06" data-end="2027-02-08" data-label="6–7 Févr."><span class="chip-dates">6–7</span><span class="chip-month">Févr.</span></button>
-      <button type="button" class="chip" data-start="2027-02-13" data-end="2027-02-15" data-label="13–14 Févr."><span class="chip-dates">13–14</span><span class="chip-month">Févr.</span></button>
-      <button type="button" class="chip" data-start="2027-02-20" data-end="2027-02-22" data-label="20–21 Févr."><span class="chip-dates">20–21</span><span class="chip-month">Févr.</span></button>
-      <button type="button" class="chip" data-start="2027-03-06" data-end="2027-03-08" data-label="6–7 Mars"><span class="chip-dates">6–7</span><span class="chip-month">Mars</span></button>
-      <button type="button" class="chip" data-start="2027-03-13" data-end="2027-03-15" data-label="13–14 Mars"><span class="chip-dates">13–14</span><span class="chip-month">Mars</span></button>
-      <button type="button" class="chip" data-start="2027-03-20" data-end="2027-03-22" data-label="20–21 Mars"><span class="chip-dates">20–21</span><span class="chip-month">Mars</span></button>
-      <button type="button" class="chip" data-start="2027-04-03" data-end="2027-04-05" data-label="3–4 Avr."><span class="chip-dates">3–4</span><span class="chip-month">Avr.</span></button>
-      <button type="button" class="chip" data-start="2027-04-10" data-end="2027-04-12" data-label="10–11 Avr."><span class="chip-dates">10–11</span><span class="chip-month">Avr.</span></button>
-      <button type="button" class="chip" data-start="2027-04-24" data-end="2027-04-26" data-label="24–25 Avr."><span class="chip-dates">24–25</span><span class="chip-month">Avr.</span></button>
+      <button type="button" class="date-box" data-start="2026-11-21" data-end="2026-11-23" data-label="21/11–22/11">21/11–22/11</button>
+      <button type="button" class="date-box" data-start="2026-12-12" data-end="2026-12-14" data-label="12/12–13/12">12/12–13/12</button>
+      <button type="button" class="date-box" data-start="2026-12-19" data-end="2026-12-21" data-label="19/12–20/12">19/12–20/12</button>
+      <button type="button" class="date-box" data-start="2027-01-30" data-end="2027-02-01" data-label="30/01–31/01">30/01–31/01</button>
+      <button type="button" class="date-box" data-start="2027-02-06" data-end="2027-02-08" data-label="06/02–07/02">06/02–07/02</button>
+      <button type="button" class="date-box" data-start="2027-02-13" data-end="2027-02-15" data-label="13/02–14/02">13/02–14/02</button>
+      <button type="button" class="date-box" data-start="2027-02-20" data-end="2027-02-22" data-label="20/02–21/02">20/02–21/02</button>
+      <button type="button" class="date-box" data-start="2027-03-06" data-end="2027-03-08" data-label="06/03–07/03">06/03–07/03</button>
+      <button type="button" class="date-box" data-start="2027-03-13" data-end="2027-03-15" data-label="13/03–14/03">13/03–14/03</button>
+      <button type="button" class="date-box" data-start="2027-03-20" data-end="2027-03-22" data-label="20/03–21/03">20/03–21/03</button>
+      <button type="button" class="date-box" data-start="2027-04-03" data-end="2027-04-05" data-label="03/04–04/04">03/04–04/04</button>
+      <button type="button" class="date-box" data-start="2027-04-10" data-end="2027-04-12" data-label="10/04–11/04">10/04–11/04</button>
+      <button type="button" class="date-box" data-start="2027-04-24" data-end="2027-04-26" data-label="24/04–25/04">24/04–25/04</button>
       <!-- FREE_END -->
     </div>
   </section>
@@ -349,13 +321,9 @@
   // accès "Tous"). Voir apps-script/README.md pour la procédure de déploiement.
   const WEBAPP_URL ='https://script.google.com/macros/s/AKfycbwEVaBMtxgoR_CcoI1lILRCl5lXzpkCNN3Yo_ky8mPWr-woWVlKTSrjEwqwLESAS3Xk/exec';
 
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  }
-
   document.querySelectorAll('.chip-grid').forEach((grid) => {
     grid.addEventListener('click', async (e) => {
-      const btn = e.target.closest('button.chip[data-start]');
+      const btn = e.target.closest('button.date-box[data-start]');
       if (!btn || btn.disabled) return;
       if (WEBAPP_URL.startsWith('REPLACE_')) {
         alert("La réservation en ligne n'est pas encore configurée — préviens directement par message pour ce week-end.");
@@ -366,9 +334,9 @@
       const name = (prompt(`Ton prénom, pour le week-end du ${label} ?`) || '').trim();
       if (!name) return;
 
-      const original = btn.innerHTML;
+      const original = btn.textContent;
       btn.disabled = true;
-      btn.classList.add('chip-pending');
+      btn.classList.add('date-box-pending');
 
       try {
         const res = await fetch(WEBAPP_URL, {
@@ -378,20 +346,21 @@
           body: JSON.stringify({ name, start: btn.dataset.start, end: btn.dataset.end }),
         });
         const data = await res.json();
-        btn.classList.remove('chip-pending');
+        btn.classList.remove('date-box-pending');
         if (data.ok) {
-          btn.classList.add('chip-confirmed');
-          btn.innerHTML = `<span class="chip-dates">✓ ${escapeHtml(name)}</span><span class="chip-month">Confirmé</span>`;
+          btn.classList.add('date-box-confirmed');
+          btn.title = `Confirmé pour ${name}`;
+          btn.textContent = `✓ ${label}`;
         } else {
           alert(data.message || "Ce week-end vient d'être pris, désolé ! Recharge la page.");
           btn.disabled = false;
-          btn.innerHTML = original;
+          btn.textContent = original;
         }
       } catch (err) {
-        btn.classList.remove('chip-pending');
+        btn.classList.remove('date-box-pending');
         alert('Erreur réseau, réessaie dans un instant.');
         btn.disabled = false;
-        btn.innerHTML = original;
+        btn.textContent = original;
       }
     });
   });

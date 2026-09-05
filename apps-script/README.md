@@ -114,8 +114,22 @@ par l'URL copiée à l'étape 6, puis commit/push sur `main`.
   Londres` dans l'agenda actuel est horodaté, pas all-day) — mais toute
   nouvelle réservation créée par `doPost` est systématiquement un
   événement all-day, pour rester cohérent avec la convention déclarée.
-- L'étiquette "Fêtes" visible sur le chip Paris de fin décembre dans la
-  version actuelle de la page est manuelle : le générateur automatique
-  affiche l'année de fin quand un séjour Paris chevauche deux années
-  civiles, faute de règle générale pour détecter "les fêtes". À ajuster
-  dans `renderParisChip()` si vous voulez ce cas spécifique.
+- Les boîtes de dates (Paris et week-ends libres) sont toutes au même
+  gabarit et affichent `JJ/MM–JJ/MM` (`renderParisChip` / `renderFreeChip`
+  / la classe CSS `.date-box`). Si vous éditez ce format, gardez le HTML
+  généré ici et la classe `.date-box` dans `index.html` synchronisés,
+  sinon la prochaine sync quotidienne écrasera vos changements de style
+  avec l'ancien format côté contenu (le HTML sera correct mais le CSS
+  pourrait ne plus matcher si vous avez aussi changé les classes).
+
+## Après une modification de Code.gs
+
+Toute modification de ce fichier (comme celle qui vient d'harmoniser le
+format des boîtes de dates) doit être répercutée à la main dans le projet
+Apps Script existant : rouvrez script.google.com, remplacez le contenu de
+`Code.gs`, enregistrez, puis **Déployer → Gérer les déploiements → ✏️ →
+Nouvelle version → Déployer** pour que le Web App déjà en place serve le
+code à jour (l'URL ne change pas). Sans cette étape, la prochaine
+exécution du déclencheur quotidien republiera la page avec l'**ancien**
+format (deux lignes jour/mois) puisque c'est le code actuellement collé
+dans Apps Script qui tourne, pas ce fichier du repo.
