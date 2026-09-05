@@ -2,13 +2,18 @@
  * Backend unique (Google Apps Script) pour "Viens me voir à Londres".
  *
  * Deux responsabilités :
- *  1. regenerateAndPublish() — relit l'agenda Google, recalcule les 3 sections
- *     de la page, et republie index.html sur GitHub. Appelée par un
- *     déclencheur temporel (voir installDailyTrigger) ET après chaque
- *     réservation.
- *  2. doPost(e) — point d'entrée du Web App public. Reçoit une demande de
- *     réservation depuis la page, crée l'événement dans l'agenda, notifie
- *     par email, puis republie la page.
+ *  1. regenerateAndPublish() — relit l'agenda Google, recalcule l'état
+ *     (séjours Paris / réservations / jours libres) et republie index.html
+ *     sur GitHub. Appelée par un déclencheur temporel (voir
+ *     installDailyTrigger) ET après chaque réservation.
+ *  2. doPost(e) — point d'entrée du Web App public. Reçoit une sélection
+ *     d'un ou plusieurs jours depuis la page, crée le ou les événements
+ *     dans l'agenda, notifie par email, puis republie la page.
+ *
+ * La page ne contient plus de HTML pré-rendu par jour : index.html embarque
+ * juste un petit bloc de données (marqueur DATA) que le calendrier, écrit une
+ * fois pour toutes côté front, lit pour dessiner la grille. Voir le <script>
+ * de données dans index.html.
  *
  * Secret requis : une propriété de script GITHUB_TOKEN (Project Settings >
  * Script Properties), jamais écrite en dur ici. Voir README.md pour la
@@ -28,6 +33,7 @@ const CONFIG = {
   windowMonths: 6,
   parisEventTitle: 'KNL à Paris',
   visitTitlePattern: /^(.+?)\s+en visite à Londres$/i,
+  maxDatesPerBooking: 60,
 };
 
 const FR_MONTHS_FULL = [
@@ -46,16 +52,14 @@ const FR_WEEKDAYS = [
  * Also wired to the daily time-driven trigger (see installDailyTrigger).
  */
 function regenerateAndPublish() {
-  const { windowStart, windowEnd } = computeWindow();
-  const sections = computeSections(windowStart, windowEnd);
-  publishSections(sections, windowStart, windowEnd);
+  publishState(computeState());
 }
 
 /**
  * Web App entry point (deploy as: Execute as Me, Access: Anyone).
- * Expects a JSON body: {"name": "...", "start": "YYYY-MM-DD", "end": "YYYY-MM-DD"}
- * where `end` is the exclusive end date already computed by the front-end
- * (start + 2 days for a Saturday-Sunday weekend).
+ * Expects a JSON body: {"name": "...", "dates": ["YYYY-MM-DD", ...]}
+ * `dates` can be any number of days, contiguous or not — one all-day
+ * Calendar event is created per contiguous run of selected days.
  */
 function doPost(e) {
   let payload;
@@ -66,31 +70,33 @@ function doPost(e) {
   }
 
   const name = (payload.name || '').toString().trim();
-  const startStr = (payload.start || '').toString().trim();
-  const endStr = (payload.end || '').toString().trim();
+  const rawDates = Array.isArray(payload.dates) ? payload.dates : [];
+  const dates = [...new Set(rawDates.map(String))].sort();
 
-  if (!name || !/^\d{4}-\d{2}-\d{2}$/.test(startStr) || !/^\d{4}-\d{2}-\d{2}$/.test(endStr)) {
-    return jsonResponse({ ok: false, message: 'Champs manquants ou invalides.' });
+  if (!name || name.length > 60) {
+    return jsonResponse({ ok: false, message: 'Prénom manquant ou trop long.' });
   }
-  if (name.length > 60) {
-    return jsonResponse({ ok: false, message: 'Prénom trop long.' });
+  if (!dates.length || dates.length > CONFIG.maxDatesPerBooking) {
+    return jsonResponse({ ok: false, message: 'Sélection de jours invalide.' });
   }
-
-  const { windowStart, windowEnd } = computeWindow();
-  const sections = computeSections(windowStart, windowEnd);
-
-  const stillFree = sections.free.some((w) => w.startKey === startStr && w.endKey === endStr);
-  if (!stillFree) {
-    return jsonResponse({ ok: false, message: "Ce week-end vient d'être pris entre-temps, désolé — recharge la page." });
+  if (!dates.every((d) => /^\d{4}-\d{2}-\d{2}$/.test(d))) {
+    return jsonResponse({ ok: false, message: 'Format de date invalide.' });
   }
 
-  const start = parseDateKey(startStr);
-  const end = parseDateKey(endStr);
+  const state = computeState();
+  const unavailable = dates.find((d) => !state.freeSet.has(d));
+  if (unavailable) {
+    return jsonResponse({ ok: false, message: `Le ${formatDDMM(parseDateKey(unavailable))} vient d'être pris entre-temps, désolé — recharge la page.` });
+  }
 
-  CalendarApp.getDefaultCalendar().createAllDayEvent(`${name} en visite à Londres`, start, end);
+  groupConsecutive(dates).forEach((run) => {
+    const start = parseDateKey(run[0]);
+    const end = addDays(parseDateKey(run[run.length - 1]), 1); // exclusif
+    CalendarApp.getDefaultCalendar().createAllDayEvent(`${name} en visite à Londres`, start, end);
+  });
 
   try {
-    notifyNewBooking(name, sections.free.find((w) => w.startKey === startStr));
+    notifyNewBooking(name, dates);
   } catch (err) {
     // Ne bloque jamais la réservation si l'email échoue.
   }
@@ -109,7 +115,7 @@ function installDailyTrigger() {
   ScriptApp.newTrigger('regenerateAndPublish').timeBased().everyDays(1).atHour(6).create();
 }
 
-// ---- Window & section computation ------------------------------------------
+// ---- State computation -------------------------------------------------------
 
 function computeWindow() {
   const tz = CONFIG.timeZone;
@@ -121,11 +127,16 @@ function computeWindow() {
   return { windowStart, windowEnd };
 }
 
-function computeSections(windowStart, windowEnd) {
+/**
+ * Lit l'agenda et calcule l'état complet : séjours Paris, réservations, et
+ * l'ensemble des jours libres (freeSet) dans la fenêtre glissante.
+ */
+function computeState() {
+  const { windowStart, windowEnd } = computeWindow();
   const events = CalendarApp.getDefaultCalendar().getEvents(windowStart, windowEnd);
 
   const parisRanges = [];
-  const visits = [];
+  const bookings = [];
 
   events.forEach((ev) => {
     const title = ev.getTitle().trim();
@@ -136,30 +147,29 @@ function computeSections(windowStart, windowEnd) {
     }
     const match = title.match(CONFIG.visitTitlePattern);
     if (match) {
-      visits.push({ name: match[1].trim(), start, end });
+      bookings.push({ name: match[1].trim(), start, end });
     }
   });
 
-  const weekends = enumerateWeekends(windowStart, windowEnd);
+  const mergedParis = mergeAdjacentRanges(parisRanges).sort((a, b) => a.start - b.start);
+  const sortedBookings = bookings.sort((a, b) => a.start - b.start);
 
-  const taken = [];
-  const free = [];
-
-  weekends.forEach((w) => {
-    if (rangesOverlapWeekend(parisRanges, w)) return; // couvert par un séjour Paris
-    const visit = visits.find((v) => rangeOverlapsWeekend(v, w));
-    if (visit) {
-      taken.push({ ...w, name: visit.name, visitStart: visit.start, visitEnd: visit.end });
-    } else {
-      free.push(w);
-    }
-  });
-
-  return {
-    paris: mergeAdjacentRanges(parisRanges).sort((a, b) => a.start - b.start),
-    taken: dedupeTakenByVisit(taken),
-    free,
+  const covered = new Set();
+  const markCovered = (range) => {
+    const from = new Date(Math.max(range.start, windowStart));
+    const to = new Date(Math.min(range.end, windowEnd));
+    for (let d = from; d < to; d.setDate(d.getDate() + 1)) covered.add(formatDateKey(d));
   };
+  mergedParis.forEach(markCovered);
+  sortedBookings.forEach(markCovered);
+
+  const freeSet = new Set();
+  for (let d = new Date(windowStart); d < windowEnd; d.setDate(d.getDate() + 1)) {
+    const key = formatDateKey(d);
+    if (!covered.has(key)) freeSet.add(key);
+  }
+
+  return { windowStart, windowEnd, parisRanges: mergedParis, bookings: sortedBookings, freeSet };
 }
 
 function eventDateRange(ev) {
@@ -169,49 +179,7 @@ function eventDateRange(ev) {
   return { start: dateOnly(ev.getStartTime(), CONFIG.timeZone), end: dateOnly(addDays(ev.getEndTime(), 1), CONFIG.timeZone) };
 }
 
-/** Génère tous les week-ends (samedi+dimanche) dans [windowStart, windowEnd). */
-function enumerateWeekends(windowStart, windowEnd) {
-  const weekends = [];
-  const cursor = new Date(windowStart);
-  // avance jusqu'au premier samedi
-  while (cursor.getDay() !== 6) cursor.setDate(cursor.getDate() + 1);
-  while (cursor < windowEnd) {
-    const saturday = new Date(cursor);
-    const sunday = addDays(saturday, 1);
-    const mondayExclusive = addDays(saturday, 2);
-    weekends.push({
-      start: saturday,
-      end: mondayExclusive, // exclusive, cohérent avec le format all-day de Calendar
-      startKey: formatDateKey(saturday),
-      endKey: formatDateKey(mondayExclusive),
-    });
-    cursor.setDate(cursor.getDate() + 7);
-  }
-  return weekends;
-}
-
-function rangeOverlapsWeekend(range, weekend) {
-  return range.start < weekend.end && range.end > weekend.start;
-}
-function rangesOverlapWeekend(ranges, weekend) {
-  return ranges.some((r) => rangeOverlapsWeekend(r, weekend));
-}
-
-function dedupeTakenByVisit(taken) {
-  const seen = new Set();
-  const out = [];
-  taken.forEach((t) => {
-    const key = t.name + '|' + formatDateKey(t.visitStart) + '|' + formatDateKey(t.visitEnd);
-    if (seen.has(key)) return;
-    seen.add(key);
-    out.push(t);
-  });
-  return out;
-}
-
 function mergeAdjacentRanges(ranges) {
-  // Chaque "KNL à Paris" est déjà un séjour complet ; pas de fusion nécessaire
-  // sauf si deux événements se chevauchent littéralement (cas limite).
   const sorted = [...ranges].sort((a, b) => a.start - b.start);
   const merged = [];
   sorted.forEach((r) => {
@@ -225,58 +193,51 @@ function mergeAdjacentRanges(ranges) {
   return merged;
 }
 
-// ---- HTML rendering ---------------------------------------------------------
+/** Regroupe une liste triée de clés 'YYYY-MM-DD' en runs de jours consécutifs. */
+function groupConsecutive(sortedKeys) {
+  const groups = [];
+  let current = [sortedKeys[0]];
+  for (let i = 1; i < sortedKeys.length; i++) {
+    const expected = formatDateKey(addDays(parseDateKey(sortedKeys[i - 1]), 1));
+    if (sortedKeys[i] === expected) {
+      current.push(sortedKeys[i]);
+    } else {
+      groups.push(current);
+      current = [sortedKeys[i]];
+    }
+  }
+  groups.push(current);
+  return groups;
+}
 
-function publishSections(sections, windowStart, windowEnd) {
-  const takenHtml = sections.taken.length
-    ? sections.taken.map(renderTakenCard).join('\n    ')
-    : '<p class="section-sub" style="margin:0">Aucune visite prévue pour l\'instant.</p>';
+// ---- Publishing ---------------------------------------------------------
 
-  const parisHtml = sections.paris.map(renderParisChip).join('\n      ');
-
-  const freeHtml = sections.free.map(renderFreeChip).join('\n      ');
-
-  const freecountHtml = `${sections.free.length} week-end${sections.free.length === 1 ? '' : 's'} encore sans plan, entre le ${formatFullDate(windowStart)} et le ${formatFullDate(windowEnd)}.`;
-
-  const footerHtml = `Dernière mise à jour : ${formatFullDateWithWeekday(new Date())} — fenêtre glissante de 6 mois à partir du ${formatFullDate(windowStart)}`;
+function publishState(state) {
+  const dataBlock = buildDataBlock(state);
+  const freeCount = state.freeSet.size;
+  const freecountText = `${freeCount} jour${freeCount === 1 ? '' : 's'} encore libre${freeCount === 1 ? '' : 's'}, entre le ${formatFullDate(state.windowStart)} et le ${formatFullDate(state.windowEnd)}.`;
+  const footerText = `Dernière mise à jour : ${formatFullDateWithWeekday(new Date())} — fenêtre glissante de 6 mois à partir du ${formatFullDate(state.windowStart)}`;
 
   const current = ghGetFile();
   let html = current.content;
-  html = replaceBetweenMarkers(html, 'TAKEN', takenHtml);
-  html = replaceBetweenMarkers(html, 'PARIS', parisHtml);
-  html = replaceBetweenMarkers(html, 'FREE', freeHtml);
-  html = replaceBetweenMarkers(html, 'FREECOUNT', freecountHtml);
-  html = replaceBetweenMarkers(html, 'FOOTER', footerHtml);
+  html = replaceBetweenMarkers(html, 'DATA', dataBlock);
+  html = replaceBetweenMarkers(html, 'FREECOUNT', freecountText);
+  html = replaceBetweenMarkers(html, 'FOOTER', footerText);
 
   if (html === current.content) return; // rien à publier
 
   ghPutFile(html, current.sha, `Sync agenda: ${formatFullDateWithWeekday(new Date())}`);
 }
 
-function renderTakenCard(t) {
-  return `<div class="taken-card">
-      <span>🎉</span>
-      <span><strong>${escapeHtml(t.name)}</strong> vient du ${formatDayMonth(t.visitStart)} au ${formatDayMonth(addDays(t.visitEnd, -1))}${yearSuffix(t.visitEnd)}</span>
-      <span class="tag">Complet</span>
-    </div>`;
-}
-
-function renderParisChip(range) {
-  const lastDay = addDays(range.end, -1);
-  return `<div class="date-box date-box-paris">${ddmmRange(range.start, lastDay)}</div>`;
-}
-
-function renderFreeChip(w) {
-  const label = ddmmRange(w.start, addDays(w.end, -1));
-  return `<button type="button" class="date-box" data-start="${w.startKey}" data-end="${w.endKey}" data-label="${label}">${label}</button>`;
-}
-
-/** "JJ/MM–JJ/MM" pour un intervalle inclusif [start, endInclusive]. */
-function ddmmRange(start, endInclusive) {
-  return `${formatDDMM(start)}–${formatDDMM(endInclusive)}`;
-}
-function formatDDMM(d) {
-  return Utilities.formatDate(d, CONFIG.timeZone, 'dd/MM');
+function buildDataBlock(state) {
+  const parisRanges = state.parisRanges.map((r) => [formatDateKey(r.start), formatDateKey(addDays(r.end, -1))]);
+  const bookings = state.bookings.map((b) => ({ name: b.name, start: formatDateKey(b.start), end: formatDateKey(addDays(b.end, -1)) }));
+  return [
+    `const WINDOW_START = ${JSON.stringify(formatDateKey(state.windowStart))};`,
+    `const WINDOW_END = ${JSON.stringify(formatDateKey(state.windowEnd))};`,
+    `const PARIS_RANGES = ${JSON.stringify(parisRanges)};`,
+    `const BOOKINGS = ${JSON.stringify(bookings)};`,
+  ].join('\n      ');
 }
 
 // ---- GitHub Contents API ----------------------------------------------------
@@ -326,12 +287,12 @@ function ghHeaders() {
 
 // ---- Notification ------------------------------------------------------------
 
-function notifyNewBooking(name, weekend) {
-  const label = weekend ? ddmmRange(weekend.start, addDays(weekend.end, -1)) : '(date inconnue)';
+function notifyNewBooking(name, dates) {
+  const labels = dates.map((d) => formatDDMM(parseDateKey(d))).join(', ');
   MailApp.sendEmail({
     to: CONFIG.notifyEmail,
     subject: `Nouvelle visite à Londres : ${name}`,
-    body: `${name} vient de réserver le week-end du ${label} sur "Viens me voir à Londres".\n\nL'événement a été ajouté à ton agenda et la page a été republiée.`,
+    body: `${name} vient de réserver ${dates.length > 1 ? 'les jours suivants' : 'le jour suivant'} sur "Viens me voir à Londres" : ${labels}.\n\nL'événement a été ajouté à ton agenda et la page a été republiée.`,
   });
 }
 
@@ -353,20 +314,14 @@ function addDays(d, n) {
   copy.setDate(copy.getDate() + n);
   return copy;
 }
-function formatDayMonth(d) {
-  return `${d.getDate()} ${FR_MONTHS_FULL[d.getMonth()]}`;
-}
-function yearSuffix(endExclusive) {
-  return ` ${addDays(endExclusive, -1).getFullYear()}`;
+function formatDDMM(d) {
+  return Utilities.formatDate(d, CONFIG.timeZone, 'dd/MM');
 }
 function formatFullDate(d) {
   return `${d.getDate()} ${FR_MONTHS_FULL[d.getMonth()]} ${d.getFullYear()}`;
 }
 function formatFullDateWithWeekday(d) {
   return `${FR_WEEKDAYS[d.getDay()]} ${formatFullDate(d)}`;
-}
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 function replaceBetweenMarkers(html, name, inner) {
   const startTag = `<!-- ${name}_START -->`;
